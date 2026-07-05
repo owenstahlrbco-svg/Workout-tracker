@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, Save, ChevronDown } from 'lucide-react'
@@ -16,12 +16,10 @@ interface ExerciseRow {
   notes: string
 }
 
-const COMMON_EXERCISES = [
-  'Squat', 'Bench Press', 'Deadlift', 'Overhead Press', 'Barbell Row',
-  'Pull Up', 'Dip', 'Incline Bench Press', 'Romanian Deadlift', 'Leg Press',
-  'Lat Pulldown', 'Cable Row', 'Dumbbell Curl', 'Tricep Pushdown',
-  'Leg Curl', 'Leg Extension', 'Hip Thrust', 'Face Pull', 'Lateral Raise',
-]
+interface Exercise {
+  name: string
+  category: string
+}
 
 function newRow(): ExerciseRow {
   return { id: crypto.randomUUID(), exercise_name: '', sets: '', reps: '', weight: '', unit: 'lbs', notes: '' }
@@ -34,8 +32,23 @@ export default function LogWorkoutPage() {
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [exercises, setExercises] = useState<Exercise[]>([])
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    async function loadExercises() {
+      const { data } = await supabase
+        .from('exercises')
+        .select('name, category')
+        .order('category')
+        .order('name')
+      setExercises(data ?? [])
+    }
+    loadExercises()
+  }, [])
+
+  const categories = [...new Set(exercises.map(e => e.category))]
 
   function updateRow(id: string, field: keyof ExerciseRow, value: string) {
     setRows(rows.map(r => r.id === id ? { ...r, [field]: value } : r))
@@ -158,7 +171,13 @@ export default function LogWorkoutPage() {
                     className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                   <datalist id={`exercises-${row.id}`}>
-                    {COMMON_EXERCISES.map(ex => <option key={ex} value={ex} />)}
+                    {categories.map(cat => (
+                      <optgroup key={cat} label={cat}>
+                        {exercises
+                          .filter(e => e.category === cat)
+                          .map(e => <option key={e.name} value={e.name} />)}
+                      </optgroup>
+                    ))}
                   </datalist>
                 </div>
 
