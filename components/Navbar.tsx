@@ -40,12 +40,12 @@ export default function Navbar({ role, name }: NavbarProps) {
     <aside className="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col h-screen sticky top-0">
       <div className="p-6 border-b border-zinc-800">
         <div className="flex items-center gap-2">
-          <Dumbbell className="text-blue-500" size={22} />
-          <span className="text-xl font-bold text-white">FitTrack</span>
+          <Dumbbell className="text-green-500" size={22} />
+          <span className="text-xl font-bold text-white">Pitch HQ Dashboard</span>
         </div>
         <p className="text-zinc-400 text-sm mt-1 truncate">{name}</p>
         {role === 'coach' && (
-          <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full mt-1 inline-block">
+          <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full mt-1 inline-block">
             Coach
           </span>
         )}
@@ -60,7 +60,7 @@ export default function Navbar({ role, name }: NavbarProps) {
               href={href}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 active
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-green-600 text-white'
                   : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
               }`}
             >

@@ -93,7 +93,7 @@ export default function ProgressCharts({ sets, exercises }: Props) {
           <select
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
-            className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
           >
             {exercises.map(ex => (
               <option key={ex} value={ex}>{ex}</option>

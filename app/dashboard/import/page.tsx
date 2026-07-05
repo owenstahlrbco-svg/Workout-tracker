@@ -137,7 +137,7 @@ export default function ImportPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Week 4 — Strength Block"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
 
@@ -153,7 +153,7 @@ export default function ImportPage() {
               onChange={(e) => setRawText(e.target.value)}
               rows={12}
               placeholder="Paste your program here..."
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-none"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm resize-none"
             />
           </div>
 
@@ -161,7 +161,7 @@ export default function ImportPage() {
             <button
               onClick={parseIntoWeek}
               disabled={!rawText.trim()}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-40 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors"
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-40 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors"
             >
               <FileText size={16} /> Parse into Days
             </button>
@@ -216,13 +216,13 @@ export default function ImportPage() {
                 type="date"
                 value={day.date}
                 onChange={(e) => updateDay(i, 'date', e.target.value)}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
               />
               <textarea
                 value={day.content}
                 onChange={(e) => updateDay(i, 'content', e.target.value)}
                 rows={4}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm resize-none"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm resize-none"
               />
             </div>
           ))}
@@ -237,7 +237,7 @@ export default function ImportPage() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold rounded-lg px-6 py-2.5 transition-colors"
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-semibold rounded-lg px-6 py-2.5 transition-colors"
             >
               <Save size={16} />
               {saving ? 'Saving...' : 'Save to Calendar'}

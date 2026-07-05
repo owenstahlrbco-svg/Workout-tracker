@@ -52,7 +52,7 @@ export default async function CoachPage() {
                 href={`/coach/client/${client.id}`}
                 className="flex items-center gap-4 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl p-5 transition-colors group"
               >
-                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
+                <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                   {client.full_name?.charAt(0) ?? '?'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -86,7 +86,7 @@ export default async function CoachPage() {
               const client = clients?.find(c => c.id === workout.user_id)
               return (
                 <div key={workout.id} className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
-                  <Dumbbell size={16} className="text-blue-400 flex-shrink-0" />
+                  <Dumbbell size={16} className="text-green-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <span className="text-white text-sm font-medium">{client?.full_name ?? 'Unknown'}</span>
                     <span className="text-zinc-500 text-sm"> logged a workout</span>

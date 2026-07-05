@@ -107,7 +107,7 @@ export default function LogWorkoutPage() {
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
           <div>
@@ -117,7 +117,7 @@ export default function LogWorkoutPage() {
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="e.g. felt strong today"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
         </div>
@@ -128,7 +128,7 @@ export default function LogWorkoutPage() {
           <h2 className="font-semibold text-white">Exercises</h2>
           <button
             onClick={() => setRows([...rows, newRow()])}
-            className="flex items-center gap-1.5 text-sm text-blue-400 hover:text-blue-300 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-green-400 hover:text-green-300 transition-colors"
           >
             <Plus size={16} /> Add Exercise
           </button>
@@ -155,7 +155,7 @@ export default function LogWorkoutPage() {
                     value={row.exercise_name}
                     onChange={(e) => updateRow(row.id, 'exercise_name', e.target.value)}
                     placeholder="Exercise name"
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                   <datalist id={`exercises-${row.id}`}>
                     {COMMON_EXERCISES.map(ex => <option key={ex} value={ex} />)}
@@ -168,27 +168,27 @@ export default function LogWorkoutPage() {
                     value={row.sets}
                     onChange={(e) => updateRow(row.id, 'sets', e.target.value)}
                     placeholder="Sets"
-                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                   />
                   <input
                     type="number"
                     value={row.reps}
                     onChange={(e) => updateRow(row.id, 'reps', e.target.value)}
                     placeholder="Reps"
-                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                   />
                   <input
                     type="number"
                     value={row.weight}
                     onChange={(e) => updateRow(row.id, 'weight', e.target.value)}
                     placeholder="Weight"
-                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                   />
                   <div className="relative">
                     <select
                       value={row.unit}
                       onChange={(e) => updateRow(row.id, 'unit', e.target.value)}
-                      className="w-full appearance-none bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      className="w-full appearance-none bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                     >
                       <option value="lbs">lbs</option>
                       <option value="kg">kg</option>
@@ -203,7 +203,7 @@ export default function LogWorkoutPage() {
                 value={row.notes}
                 onChange={(e) => updateRow(row.id, 'notes', e.target.value)}
                 placeholder="Notes (optional, e.g. paused reps, tempo)"
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
               />
             </div>
           ))}
@@ -214,7 +214,7 @@ export default function LogWorkoutPage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-semibold rounded-lg px-6 py-2.5 transition-colors"
+          className="flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-semibold rounded-lg px-6 py-2.5 transition-colors"
         >
           <Save size={16} />
           {saving ? 'Saving...' : 'Save Workout'}

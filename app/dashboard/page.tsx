@@ -64,7 +64,7 @@ export default async function DashboardPage() {
         <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {[
-            { href: '/dashboard/log', icon: Dumbbell, label: 'Log a Workout', desc: 'Record today\'s session', color: 'text-blue-400' },
+            { href: '/dashboard/log', icon: Dumbbell, label: 'Log a Workout', desc: 'Record today\'s session', color: 'text-green-400' },
             { href: '/dashboard/progress', icon: TrendingUp, label: 'View Progress', desc: 'See your lift history', color: 'text-green-400' },
             { href: '/dashboard/calendar', icon: CalendarDays, label: 'View Calendar', desc: 'See your program', color: 'text-purple-400' },
             { href: '/dashboard/import', icon: FileText, label: 'Import Program', desc: 'Paste from Google Docs', color: 'text-orange-400' },
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center">
             <Dumbbell size={32} className="text-zinc-600 mx-auto mb-3" />
             <p className="text-zinc-400">No workouts logged yet.</p>
-            <Link href="/dashboard/log" className="text-blue-400 text-sm hover:text-blue-300 mt-1 inline-block">
+            <Link href="/dashboard/log" className="text-green-400 text-sm hover:text-green-300 mt-1 inline-block">
               Log your first workout →
             </Link>
           </div>

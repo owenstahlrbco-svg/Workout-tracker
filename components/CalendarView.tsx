@@ -88,15 +88,15 @@ export default function CalendarView({ workouts, programDays }: Props) {
                 onClick={() => setSelected(isSelected ? null : day)}
                 className={`relative aspect-square flex flex-col items-center justify-center rounded-lg text-sm transition-colors p-1 ${
                   isSelected
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-green-600 text-white'
                     : todayDay
-                    ? 'bg-zinc-700 text-white ring-2 ring-blue-500'
+                    ? 'bg-zinc-700 text-white ring-2 ring-green-500'
                     : 'hover:bg-zinc-800 text-zinc-300'
                 }`}
               >
                 <span className="font-medium">{format(day, 'd')}</span>
                 <div className="flex gap-0.5 mt-0.5">
-                  {hasWorkout && <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />}
+                  {hasWorkout && <span className="w-1.5 h-1.5 rounded-full bg-green-400" />}
                   {hasProgram && <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />}
                 </div>
               </button>
@@ -107,7 +107,7 @@ export default function CalendarView({ workouts, programDays }: Props) {
         {/* Legend */}
         <div className="flex gap-4 mt-4 pt-4 border-t border-zinc-800">
           <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-            <span className="w-2 h-2 rounded-full bg-blue-400" /> Logged workout
+            <span className="w-2 h-2 rounded-full bg-green-400" /> Logged workout
           </div>
           <div className="flex items-center gap-1.5 text-xs text-zinc-400">
             <span className="w-2 h-2 rounded-full bg-orange-400" /> Programmed day
@@ -122,7 +122,7 @@ export default function CalendarView({ workouts, programDays }: Props) {
 
           {selectedWorkout ? (
             <div>
-              <div className="flex items-center gap-2 text-blue-400 text-sm font-medium mb-2">
+              <div className="flex items-center gap-2 text-green-400 text-sm font-medium mb-2">
                 <Dumbbell size={15} /> Logged Workout
               </div>
               <div className="space-y-1.5">
