@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, Save, ChevronDown } from 'lucide-react'
@@ -32,21 +32,12 @@ function ExerciseInput({ value, onChange, exercises }: {
 }) {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState(value)
-  const ref = useRef<HTMLDivElement>(null)
 
   const filtered = query.trim().length === 0
     ? exercises
     : exercises.filter(e => e.name.toLowerCase().includes(query.toLowerCase()))
 
   const categories = [...new Set(filtered.map(e => e.category))]
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
 
   function select(name: string) {
     setQuery(name)
@@ -55,12 +46,13 @@ function ExerciseInput({ value, onChange, exercises }: {
   }
 
   return (
-    <div ref={ref} className="relative">
+    <div className="relative">
       <input
         type="text"
         value={query}
         placeholder="Exercise name"
         onFocus={() => setOpen(true)}
+        onBlur={() => setTimeout(() => setOpen(false), 200)}
         onChange={e => {
           setQuery(e.target.value)
           onChange(e.target.value)
@@ -69,7 +61,7 @@ function ExerciseInput({ value, onChange, exercises }: {
         className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
       />
       {open && filtered.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl max-h-60 overflow-y-auto">
           {categories.map(cat => (
             <div key={cat}>
               <div className="px-3 py-1.5 text-xs font-semibold text-green-400 uppercase tracking-wide bg-zinc-900 sticky top-0">
@@ -79,8 +71,10 @@ function ExerciseInput({ value, onChange, exercises }: {
                 <button
                   key={e.name}
                   type="button"
-                  onMouseDown={() => select(e.name)}
-                  className="w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700 transition-colors"
+                  onMouseDown={e => { e.preventDefault(); select(e.currentTarget.dataset.name!) }}
+                  onTouchEnd={e => { e.preventDefault(); select(e.currentTarget.dataset.name!) }}
+                  data-name={e.name}
+                  className="w-full text-left px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-700 active:bg-zinc-600 transition-colors"
                 >
                   {e.name}
                 </button>
