@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, Save, ChevronDown } from 'lucide-react'
@@ -25,6 +25,74 @@ function newRow(): ExerciseRow {
   return { id: crypto.randomUUID(), exercise_name: '', sets: '', reps: '', weight: '', unit: 'lbs', notes: '' }
 }
 
+function ExerciseInput({ value, onChange, exercises }: {
+  value: string
+  onChange: (val: string) => void
+  exercises: Exercise[]
+}) {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState(value)
+  const ref = useRef<HTMLDivElement>(null)
+
+  const filtered = query.trim().length === 0
+    ? exercises
+    : exercises.filter(e => e.name.toLowerCase().includes(query.toLowerCase()))
+
+  const categories = [...new Set(filtered.map(e => e.category))]
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  function select(name: string) {
+    setQuery(name)
+    onChange(name)
+    setOpen(false)
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <input
+        type="text"
+        value={query}
+        placeholder="Exercise name"
+        onFocus={() => setOpen(true)}
+        onChange={e => {
+          setQuery(e.target.value)
+          onChange(e.target.value)
+          setOpen(true)
+        }}
+        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+      />
+      {open && filtered.length > 0 && (
+        <div className="absolute z-50 mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl max-h-64 overflow-y-auto">
+          {categories.map(cat => (
+            <div key={cat}>
+              <div className="px-3 py-1.5 text-xs font-semibold text-green-400 uppercase tracking-wide bg-zinc-900 sticky top-0">
+                {cat}
+              </div>
+              {filtered.filter(e => e.category === cat).map(e => (
+                <button
+                  key={e.name}
+                  type="button"
+                  onMouseDown={() => select(e.name)}
+                  className="w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700 transition-colors"
+                >
+                  {e.name}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function LogWorkoutPage() {
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'))
   const [notes, setNotes] = useState('')
@@ -47,8 +115,6 @@ export default function LogWorkoutPage() {
     }
     loadExercises()
   }, [])
-
-  const categories = [...new Set(exercises.map(e => e.category))]
 
   function updateRow(id: string, field: keyof ExerciseRow, value: string) {
     setRows(rows.map(r => r.id === id ? { ...r, [field]: value } : r))
@@ -152,30 +218,17 @@ export default function LogWorkoutPage() {
             <div key={row.id} className="p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-zinc-400 text-sm font-medium">Exercise {i + 1}</span>
-                <button
-                  onClick={() => removeRow(row.id)}
-                  className="text-zinc-600 hover:text-red-400 transition-colors"
-                >
+                <button onClick={() => removeRow(row.id)} className="text-zinc-600 hover:text-red-400 transition-colors">
                   <Trash2 size={15} />
                 </button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="relative">
-                  <input
-                    type="text"
-                    list={`exercises-${row.id}`}
-                    value={row.exercise_name}
-                    onChange={(e) => updateRow(row.id, 'exercise_name', e.target.value)}
-                    placeholder="Exercise name"
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                  <datalist id={`exercises-${row.id}`}>
-                    {exercises.map(e => (
-                      <option key={e.name} value={e.name} />
-                    ))}
-                  </datalist>
-                </div>
+                <ExerciseInput
+                  value={row.exercise_name}
+                  onChange={(val) => updateRow(row.id, 'exercise_name', val)}
+                  exercises={exercises}
+                />
 
                 <div className="grid grid-cols-4 gap-2">
                   <input
