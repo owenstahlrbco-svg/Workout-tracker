@@ -171,12 +171,8 @@ export default function LogWorkoutPage() {
                     className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                   <datalist id={`exercises-${row.id}`}>
-                    {categories.map(cat => (
-                      <optgroup key={cat} label={cat}>
-                        {exercises
-                          .filter(e => e.category === cat)
-                          .map(e => <option key={e.name} value={e.name} />)}
-                      </optgroup>
+                    {exercises.map(e => (
+                      <option key={e.name} value={e.name} />
                     ))}
                   </datalist>
                 </div>
