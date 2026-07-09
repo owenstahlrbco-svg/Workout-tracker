@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { FileText, Plus, Trash2, Save, ChevronDown } from 'lucide-react'
+import { FileText, Plus, Trash2, Save } from 'lucide-react'
 import { format } from 'date-fns'
 
 interface ProgramDay {
@@ -15,6 +15,8 @@ interface SavedProgram {
   title: string
   created_at: string
 }
+
+const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
 
 export default function ImportPage() {
   const [title, setTitle] = useState('')
@@ -39,7 +41,7 @@ export default function ImportPage() {
       setPrograms(data ?? [])
     }
     load()
-  }, [success])
+  }, [success]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function parseIntoWeek() {
     if (!rawText.trim()) return
@@ -75,7 +77,7 @@ export default function ImportPage() {
 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setError('Not signed in'); setSaving(false); return }
-    if (!title.trim()) { setError('Give your program a title.'); setSaving(false); return }
+    if (!title.trim()) { setError('Give your plan a title.'); setSaving(false); return }
 
     const { data: program, error: pErr } = await supabase
       .from('programs')
@@ -113,47 +115,51 @@ export default function ImportPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white">Import Program</h1>
-        <p className="text-zinc-400 mt-1">Paste your program from Google Docs or anywhere else.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Your Plans</p>
+        <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1">Import a Plan</h1>
+        <p className="text-emerald-950/55 mt-2">
+          Got a Google Doc from Owen or the Skool community? Paste it here, place each workout on the
+          day you want, and it shows up on your calendar automatically.
+        </p>
       </div>
 
       {success && (
-        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-green-400">
-          Program saved! It will appear on your calendar.
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-800">
+          Plan saved! Your workouts now appear on your calendar.
         </div>
       )}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
           {error}
         </div>
       )}
 
       {step === 'input' && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
+        <div className="bg-white border border-emerald-900/10 rounded-3xl p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1.5">Program Title</label>
+            <label className="block text-sm font-medium text-emerald-950 mb-1.5">Plan Title</label>
             <input
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Week 4 — Strength Block"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className={inputClass}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1.5">
-              Paste Program Content
+            <label className="block text-sm font-medium text-emerald-950 mb-1.5">
+              Paste Plan Content
             </label>
-            <p className="text-zinc-500 text-xs mb-2">
-              Open your Google Doc → Select All → Copy → Paste here.
+            <p className="text-emerald-950/45 text-xs mb-2">
+              Open your Google Doc → Select All → Copy → Paste here. Works with any plan from Owen or Skool.
             </p>
             <textarea
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}
               rows={12}
-              placeholder="Paste your program here..."
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm resize-none"
+              placeholder="Paste your plan here..."
+              className={`${inputClass} py-3 font-mono text-sm resize-none`}
             />
           </div>
 
@@ -161,9 +167,9 @@ export default function ImportPage() {
             <button
               onClick={parseIntoWeek}
               disabled={!rawText.trim()}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-40 text-white font-semibold rounded-lg px-5 py-2.5 transition-colors"
+              className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-40 text-white font-semibold rounded-xl px-5 py-2.5 transition-colors"
             >
-              <FileText size={16} /> Parse into Days
+              <FileText size={16} /> Place on Calendar Days
             </button>
             <button
               onClick={async () => {
@@ -179,7 +185,7 @@ export default function ImportPage() {
                 setTimeout(() => setSuccess(false), 3000)
               }}
               disabled={saving || !rawText.trim()}
-              className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-40 text-zinc-300 font-medium rounded-lg px-5 py-2.5 transition-colors"
+              className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 disabled:opacity-40 text-emerald-950 font-medium rounded-xl px-5 py-2.5 transition-colors"
             >
               <Save size={16} /> Save as-is
             </button>
@@ -189,26 +195,27 @@ export default function ImportPage() {
 
       {step === 'assign' && (
         <div className="space-y-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+          <div className="bg-white border border-emerald-900/10 rounded-3xl p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-white">Assign Days to Calendar</h2>
+              <h2 className="font-display text-lg font-semibold text-emerald-950">Place Workouts on Days</h2>
               <button
                 onClick={() => setStep('input')}
-                className="text-sm text-zinc-400 hover:text-white transition-colors"
+                className="text-sm text-emerald-950/55 hover:text-emerald-950 transition-colors"
               >
                 ← Back
               </button>
             </div>
-            <p className="text-zinc-400 text-sm">
-              We split your program into {days.length} days. Adjust dates and content as needed.
+            <p className="text-emerald-950/55 text-sm">
+              We split your plan into {days.length} days. Pick the exact date for each workout —
+              they&apos;ll pop up on your calendar on those days.
             </p>
           </div>
 
           {days.map((day, i) => (
-            <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
+            <div key={i} className="bg-white border border-emerald-900/10 rounded-3xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-zinc-300 font-medium text-sm">Day {i + 1}</span>
-                <button onClick={() => removeDay(i)} className="text-zinc-600 hover:text-red-400 transition-colors">
+                <span className="text-emerald-950/75 font-semibold text-sm">Day {i + 1}</span>
+                <button onClick={() => removeDay(i)} className="text-emerald-950/30 hover:text-red-500 transition-colors">
                   <Trash2 size={15} />
                 </button>
               </div>
@@ -216,13 +223,13 @@ export default function ImportPage() {
                 type="date"
                 value={day.date}
                 onChange={(e) => updateDay(i, 'date', e.target.value)}
-                className="bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                className="bg-white border border-emerald-900/15 rounded-xl px-4 py-2 text-emerald-950 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm"
               />
               <textarea
                 value={day.content}
                 onChange={(e) => updateDay(i, 'content', e.target.value)}
                 rows={4}
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-green-500 font-mono text-sm resize-none"
+                className={`${inputClass} py-3 font-mono text-sm resize-none`}
               />
             </div>
           ))}
@@ -230,14 +237,14 @@ export default function ImportPage() {
           <div className="flex gap-3">
             <button
               onClick={() => setDays([...days, { date: format(new Date(), 'yyyy-MM-dd'), content: '' }])}
-              className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-lg px-4 py-2.5 text-sm transition-colors"
+              className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 text-emerald-950 rounded-xl px-4 py-2.5 text-sm transition-colors"
             >
               <Plus size={15} /> Add Day
             </button>
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-semibold rounded-lg px-6 py-2.5 transition-colors"
+              className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-colors"
             >
               <Save size={16} />
               {saving ? 'Saving...' : 'Save to Calendar'}
@@ -248,20 +255,20 @@ export default function ImportPage() {
 
       {/* Saved programs */}
       {programs.length > 0 && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          <div className="p-5 border-b border-zinc-800">
-            <h2 className="font-semibold text-white">Saved Programs</h2>
+        <div className="bg-white border border-emerald-900/10 rounded-3xl overflow-hidden">
+          <div className="p-5 border-b border-emerald-900/10">
+            <h2 className="font-display text-lg font-semibold text-emerald-950">Saved Plans</h2>
           </div>
-          <div className="divide-y divide-zinc-800">
+          <div className="divide-y divide-emerald-900/10">
             {programs.map(p => (
               <div key={p.id} className="flex items-center justify-between px-5 py-3">
                 <div>
-                  <p className="text-white text-sm font-medium">{p.title}</p>
-                  <p className="text-zinc-500 text-xs">{format(new Date(p.created_at), 'MMM d, yyyy')}</p>
+                  <p className="text-emerald-950 text-sm font-semibold">{p.title}</p>
+                  <p className="text-emerald-950/45 text-xs">{format(new Date(p.created_at), 'MMM d, yyyy')}</p>
                 </div>
                 <button
                   onClick={() => deleteProgram(p.id)}
-                  className="text-zinc-600 hover:text-red-400 transition-colors"
+                  className="text-emerald-950/30 hover:text-red-500 transition-colors"
                 >
                   <Trash2 size={15} />
                 </button>

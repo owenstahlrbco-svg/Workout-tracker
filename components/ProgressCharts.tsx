@@ -54,46 +54,31 @@ export default function ProgressCharts({ sets, exercises }: Props) {
 
   if (exercises.length === 0) {
     return (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-12 text-center">
-        <TrendingUp size={40} className="text-zinc-600 mx-auto mb-4" />
-        <p className="text-zinc-400">No workout data yet. Log a workout to see your progress here.</p>
+      <div className="bg-white border border-emerald-900/10 rounded-3xl p-12 text-center">
+        <TrendingUp size={40} className="text-emerald-900/25 mx-auto mb-4" />
+        <p className="text-emerald-950/55">No workout data yet. Log a workout to see your progress here.</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-6">
-      {/* PR Table */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-        <div className="p-5 border-b border-zinc-800">
-          <h2 className="font-semibold text-white">Personal Records</h2>
-        </div>
-        <div className="divide-y divide-zinc-800">
-          {prs.map(({ exercise, max, unit }) => (
-            <div key={exercise} className="flex items-center justify-between px-5 py-3">
-              <span className="text-zinc-300 text-sm">{exercise}</span>
-              <span className="text-white font-semibold text-sm">{max} {unit}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Line Chart */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+      <div className="bg-white border border-emerald-900/10 rounded-2xl p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="font-semibold text-white">Weight Over Time</h2>
+            <h2 className="font-display text-lg font-semibold text-emerald-950">Weight Over Time</h2>
             {chartData.length > 0 && (
-              <p className="text-zinc-400 text-sm mt-0.5">
-                Current: <span className="text-white font-medium">{latestWeight} lbs</span>
-                {' · '}PR: <span className="text-green-400 font-medium">{maxWeight} lbs</span>
+              <p className="text-emerald-950/55 text-sm mt-0.5">
+                Current: <span className="text-emerald-950 font-semibold">{latestWeight} lbs</span>
+                {' · '}PR: <span className="text-emerald-700 font-semibold">{maxWeight} lbs</span>
               </p>
             )}
           </div>
           <select
             value={selected}
             onChange={(e) => setSelected(e.target.value)}
-            className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="bg-white border border-emerald-900/15 rounded-xl px-3 py-1.5 text-emerald-950 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600"
           >
             {exercises.map(ex => (
               <option key={ex} value={ex}>{ex}</option>
@@ -104,29 +89,44 @@ export default function ProgressCharts({ sets, exercises }: Props) {
         {chartData.length > 1 ? (
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
-              <XAxis dataKey="date" tick={{ fill: '#71717a', fontSize: 12 }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: '#71717a', fontSize: 12 }} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#d9e8df" />
+              <XAxis dataKey="date" tick={{ fill: '#5d7268', fontSize: 12 }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fill: '#5d7268', fontSize: 12 }} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px' }}
-                labelStyle={{ color: '#a1a1aa' }}
-                itemStyle={{ color: '#3b82f6' }}
+                contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #d9e8df', borderRadius: '12px', boxShadow: '0 4px 20px rgba(6,78,59,0.1)' }}
+                labelStyle={{ color: '#5d7268' }}
+                itemStyle={{ color: '#047857' }}
               />
               <Line
                 type="monotone"
                 dataKey="weight"
-                stroke="#3b82f6"
-                strokeWidth={2}
-                dot={{ fill: '#3b82f6', r: 4 }}
+                stroke="#047857"
+                strokeWidth={2.5}
+                dot={{ fill: '#047857', r: 4 }}
                 activeDot={{ r: 6 }}
               />
             </LineChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-64 flex items-center justify-center text-zinc-500">
+          <div className="h-64 flex items-center justify-center text-emerald-950/45">
             Log {selected} at least twice to see a chart.
           </div>
         )}
+      </div>
+
+      {/* PR Table */}
+      <div className="bg-white border border-emerald-900/10 rounded-2xl overflow-hidden">
+        <div className="p-5 border-b border-emerald-900/10">
+          <h2 className="font-display text-lg font-semibold text-emerald-950">Personal Records</h2>
+        </div>
+        <div className="divide-y divide-emerald-900/10">
+          {prs.map(({ exercise, max, unit }) => (
+            <div key={exercise} className="flex items-center justify-between px-5 py-3">
+              <span className="text-emerald-950/75 text-sm">{exercise}</span>
+              <span className="text-emerald-950 font-semibold text-sm">{max} {unit}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )

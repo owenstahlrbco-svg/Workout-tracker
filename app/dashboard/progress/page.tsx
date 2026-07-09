@@ -18,8 +18,9 @@ export default async function ProgressPage() {
   return (
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white">Progress</h1>
-        <p className="text-zinc-400 mt-1">Track your lift history and personal records.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Tracker</p>
+        <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1">Progress</h1>
+        <p className="text-emerald-950/55 mt-2">Your lift history and personal records — watch the line go up.</p>
       </div>
       <ProgressCharts sets={sets ?? []} exercises={exercises} />
     </div>

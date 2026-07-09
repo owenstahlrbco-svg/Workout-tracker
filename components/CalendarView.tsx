@@ -34,28 +34,28 @@ export default function CalendarView({ workouts, programDays }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6">
+      <div className="bg-white border border-emerald-900/10 rounded-3xl p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">
+          <h2 className="font-display text-2xl font-semibold text-emerald-950">
             {format(current, 'MMMM yyyy')}
           </h2>
           <div className="flex gap-2">
             <button
               onClick={() => setCurrent(subMonths(current, 1))}
-              className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+              className="p-2 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 transition-colors"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => setCurrent(new Date())}
-              className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white text-sm transition-colors"
+              className="px-3 py-1.5 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 text-sm transition-colors"
             >
               Today
             </button>
             <button
               onClick={() => setCurrent(addMonths(current, 1))}
-              className="p-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white transition-colors"
+              className="p-2 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 transition-colors"
             >
               <ChevronRight size={16} />
             </button>
@@ -65,7 +65,7 @@ export default function CalendarView({ workouts, programDays }: Props) {
         {/* Day labels */}
         <div className="grid grid-cols-7 mb-2">
           {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-            <div key={d} className="text-center text-xs font-medium text-zinc-500 py-2">{d}</div>
+            <div key={d} className="text-center text-xs font-semibold uppercase tracking-wider text-emerald-950/40 py-2">{d}</div>
           ))}
         </div>
 
@@ -86,18 +86,18 @@ export default function CalendarView({ workouts, programDays }: Props) {
               <button
                 key={day.toISOString()}
                 onClick={() => setSelected(isSelected ? null : day)}
-                className={`relative aspect-square flex flex-col items-center justify-center rounded-lg text-sm transition-colors p-1 ${
+                className={`relative aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition-colors p-1 ${
                   isSelected
-                    ? 'bg-green-600 text-white'
+                    ? 'bg-emerald-800 text-white'
                     : todayDay
-                    ? 'bg-zinc-700 text-white ring-2 ring-green-500'
-                    : 'hover:bg-zinc-800 text-zinc-300'
+                    ? 'bg-emerald-50 text-emerald-950 ring-2 ring-emerald-600'
+                    : 'hover:bg-emerald-900/5 text-emerald-950/75'
                 }`}
               >
                 <span className="font-medium">{format(day, 'd')}</span>
                 <div className="flex gap-0.5 mt-0.5">
-                  {hasWorkout && <span className="w-1.5 h-1.5 rounded-full bg-green-400" />}
-                  {hasProgram && <span className="w-1.5 h-1.5 rounded-full bg-orange-400" />}
+                  {hasWorkout && <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-emerald-600'}`} />}
+                  {hasProgram && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
                 </div>
               </button>
             )
@@ -105,47 +105,47 @@ export default function CalendarView({ workouts, programDays }: Props) {
         </div>
 
         {/* Legend */}
-        <div className="flex gap-4 mt-4 pt-4 border-t border-zinc-800">
-          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-            <span className="w-2 h-2 rounded-full bg-green-400" /> Logged workout
+        <div className="flex gap-4 mt-4 pt-4 border-t border-emerald-900/10">
+          <div className="flex items-center gap-1.5 text-xs text-emerald-950/55">
+            <span className="w-2 h-2 rounded-full bg-emerald-600" /> Logged workout
           </div>
-          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-            <span className="w-2 h-2 rounded-full bg-orange-400" /> Programmed day
+          <div className="flex items-center gap-1.5 text-xs text-emerald-950/55">
+            <span className="w-2 h-2 rounded-full bg-amber-400" /> Programmed day
           </div>
         </div>
       </div>
 
       {/* Selected day detail */}
       {selected && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
-          <h3 className="font-semibold text-white">{format(selected, 'EEEE, MMMM d')}</h3>
+        <div className="bg-white border border-emerald-900/10 rounded-3xl p-6 space-y-4">
+          <h3 className="font-display text-lg font-semibold text-emerald-950">{format(selected, 'EEEE, MMMM d')}</h3>
 
           {selectedWorkout ? (
             <div>
-              <div className="flex items-center gap-2 text-green-400 text-sm font-medium mb-2">
+              <div className="flex items-center gap-2 text-emerald-700 text-sm font-semibold mb-2">
                 <Dumbbell size={15} /> Logged Workout
               </div>
               <div className="space-y-1.5">
                 {selectedWorkout.workout_sets?.map(s => (
-                  <div key={s.id} className="text-zinc-300 text-sm bg-zinc-800 rounded-lg px-3 py-2">
+                  <div key={s.id} className="text-emerald-950/80 text-sm bg-emerald-50 rounded-xl px-3 py-2">
                     {s.exercise_name}
                   </div>
                 ))}
                 {selectedWorkout.notes && (
-                  <p className="text-zinc-400 text-sm mt-2 italic">{selectedWorkout.notes}</p>
+                  <p className="text-emerald-950/55 text-sm mt-2 italic">{selectedWorkout.notes}</p>
                 )}
               </div>
             </div>
           ) : (
-            <p className="text-zinc-500 text-sm">No workout logged for this day.</p>
+            <p className="text-emerald-950/45 text-sm">No workout logged for this day.</p>
           )}
 
           {selectedProgram && (
             <div>
-              <div className="flex items-center gap-2 text-orange-400 text-sm font-medium mb-2">
+              <div className="flex items-center gap-2 text-amber-600 text-sm font-semibold mb-2">
                 <FileText size={15} /> Programmed Session
               </div>
-              <div className="bg-zinc-800 rounded-lg p-4 text-zinc-300 text-sm whitespace-pre-wrap">
+              <div className="bg-emerald-900/5 rounded-xl p-4 text-emerald-950/80 text-sm whitespace-pre-wrap">
                 {selectedProgram.content}
               </div>
             </div>

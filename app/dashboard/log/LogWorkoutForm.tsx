@@ -21,6 +21,8 @@ interface Exercise {
   category: string
 }
 
+const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+
 function newRow(): ExerciseRow {
   return { id: crypto.randomUUID(), exercise_name: '', sets: '', reps: '', weight: '', unit: 'lbs', notes: '' }
 }
@@ -58,13 +60,13 @@ function ExerciseInput({ value, onChange, exercises }: {
           onChange(e.target.value)
           setOpen(true)
         }}
-        className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
+        className={inputClass}
       />
       {open && filtered.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-zinc-800 border border-zinc-700 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-white border border-emerald-900/15 rounded-xl shadow-xl max-h-60 overflow-y-auto">
           {categories.map(cat => (
             <div key={cat}>
-              <div className="px-3 py-1.5 text-xs font-semibold text-green-400 uppercase tracking-wide bg-zinc-900 sticky top-0">
+              <div className="px-3 py-1.5 text-xs font-semibold text-emerald-700 uppercase tracking-wide bg-emerald-50 sticky top-0">
                 {cat}
               </div>
               {filtered.filter(e => e.category === cat).map(e => (
@@ -73,7 +75,7 @@ function ExerciseInput({ value, onChange, exercises }: {
                   type="button"
                   onMouseDown={ev => { ev.preventDefault(); select(e.name) }}
                   onTouchEnd={ev => { ev.preventDefault(); select(e.name) }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-700 active:bg-zinc-600 transition-colors"
+                  className="w-full text-left px-4 py-2.5 text-sm text-emerald-950 hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
                 >
                   {e.name}
                 </button>
@@ -143,57 +145,48 @@ export default function LogWorkoutForm({ exercises }: { exercises: Exercise[] })
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-white">Log Workout</h1>
-        <p className="text-zinc-400 mt-1">Record your exercises, sets, reps, and weight.</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Tracker</p>
+        <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1">Log Workout</h1>
+        <p className="text-emerald-950/55 mt-2">Record your exercises, sets, reps, and weight.</p>
       </div>
 
       {success && (
-        <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-4 text-green-400">
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-800">
           Workout saved! Redirecting...
         </div>
       )}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-400">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700">
           {error}
         </div>
       )}
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
+      <div className="bg-white border border-emerald-900/10 rounded-2xl p-6 space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1.5">Date</label>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+            <label className="block text-sm font-medium text-emerald-950 mb-1.5">Date</label>
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={inputClass} />
           </div>
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-1.5">Session Notes (optional)</label>
-            <input
-              type="text"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. felt strong today"
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
+            <label className="block text-sm font-medium text-emerald-950 mb-1.5">Session Notes (optional)</label>
+            <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)}
+              placeholder="e.g. felt strong today" className={inputClass} />
           </div>
         </div>
       </div>
 
-      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-        <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
-          <h2 className="font-semibold text-white">Exercises</h2>
-          <p className="text-zinc-500 text-xs">{exercises.length} exercises available</p>
+      <div className="bg-white border border-emerald-900/10 rounded-2xl overflow-hidden">
+        <div className="p-4 border-b border-emerald-900/10 flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold text-emerald-950">Exercises</h2>
+          <p className="text-emerald-950/45 text-xs">{exercises.length} exercises available</p>
         </div>
 
-        <div className="divide-y divide-zinc-800">
+        <div className="divide-y divide-emerald-900/10">
           {rows.map((row, i) => (
             <div key={row.id} className="p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-zinc-400 text-sm font-medium">Exercise {i + 1}</span>
-                <button onClick={() => removeRow(row.id)} className="text-zinc-600 hover:text-red-400 transition-colors">
+                <span className="text-emerald-950/55 text-sm font-medium">Exercise {i + 1}</span>
+                <button onClick={() => removeRow(row.id)} className="text-emerald-950/30 hover:text-red-500 transition-colors">
                   <Trash2 size={15} />
                 </button>
               </div>
@@ -206,37 +199,22 @@ export default function LogWorkoutForm({ exercises }: { exercises: Exercise[] })
                 />
 
                 <div className="grid grid-cols-4 gap-2">
-                  <input
-                    type="number"
-                    value={row.sets}
-                    onChange={(e) => updateRow(row.id, 'sets', e.target.value)}
-                    placeholder="Sets"
-                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                  />
-                  <input
-                    type="number"
-                    value={row.reps}
-                    onChange={(e) => updateRow(row.id, 'reps', e.target.value)}
-                    placeholder="Reps"
-                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                  />
-                  <input
-                    type="number"
-                    value={row.weight}
-                    onChange={(e) => updateRow(row.id, 'weight', e.target.value)}
-                    placeholder="Weight"
-                    className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                  />
+                  <input type="number" value={row.sets} onChange={(e) => updateRow(row.id, 'sets', e.target.value)}
+                    placeholder="Sets" className={`${inputClass} px-3 text-sm`} />
+                  <input type="number" value={row.reps} onChange={(e) => updateRow(row.id, 'reps', e.target.value)}
+                    placeholder="Reps" className={`${inputClass} px-3 text-sm`} />
+                  <input type="number" value={row.weight} onChange={(e) => updateRow(row.id, 'weight', e.target.value)}
+                    placeholder="Weight" className={`${inputClass} px-3 text-sm`} />
                   <div className="relative">
                     <select
                       value={row.unit}
                       onChange={(e) => updateRow(row.id, 'unit', e.target.value)}
-                      className="w-full appearance-none bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                      className={`${inputClass} appearance-none px-3 text-sm`}
                     >
                       <option value="lbs">lbs</option>
                       <option value="kg">kg</option>
                     </select>
-                    <ChevronDown size={12} className="absolute right-2 top-3.5 text-zinc-400 pointer-events-none" />
+                    <ChevronDown size={12} className="absolute right-2 top-3.5 text-emerald-950/40 pointer-events-none" />
                   </div>
                 </div>
               </div>
@@ -246,7 +224,7 @@ export default function LogWorkoutForm({ exercises }: { exercises: Exercise[] })
                 value={row.notes}
                 onChange={(e) => updateRow(row.id, 'notes', e.target.value)}
                 placeholder="Notes (optional, e.g. paused reps, tempo)"
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                className={`${inputClass} py-2 text-sm`}
               />
             </div>
           ))}
@@ -257,14 +235,14 @@ export default function LogWorkoutForm({ exercises }: { exercises: Exercise[] })
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-500 disabled:opacity-50 text-white font-semibold rounded-lg px-6 py-2.5 transition-colors"
+          className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-colors"
         >
           <Save size={16} />
           {saving ? 'Saving...' : 'Save Workout'}
         </button>
         <button
           onClick={() => setRows([...rows, newRow()])}
-          className="flex items-center gap-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium rounded-lg px-4 py-2.5 transition-colors"
+          className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 text-emerald-950 font-medium rounded-xl px-4 py-2.5 transition-colors"
         >
           <Plus size={16} /> Add Exercise
         </button>
