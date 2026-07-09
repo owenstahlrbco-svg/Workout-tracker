@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { Dumbbell, TrendingUp, CalendarDays, FileText, ChevronRight, MessageCircle, Flame } from 'lucide-react'
 import { parseDate } from '@/lib/dates'
+import { quoteForToday } from '@/lib/quotes'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -42,9 +43,21 @@ export default async function DashboardPage() {
   const loggedToday = recentWorkouts?.some(w => w.date === todayStr) ?? false
 
   const today = format(new Date(), 'EEEE, MMMM d')
+  const quote = quoteForToday()
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
+      {/* Quote of the day */}
+      <div className="border-l-2 border-emerald-600/70 pl-5 py-1">
+        <p className="font-display text-xl italic text-emerald-950/85 leading-relaxed">
+          &ldquo;{quote.text}&rdquo;
+        </p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-700 mt-2">
+          {quote.author}
+          <span className="text-emerald-950/40 normal-case tracking-normal font-normal"> — {quote.title}</span>
+        </p>
+      </div>
+
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">{today}</p>
         <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1">
