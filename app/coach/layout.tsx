@@ -15,9 +15,9 @@ export default async function CoachLayout({ children }: { children: React.ReactN
   const name = profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? ''
 
   return (
-    <div className="flex h-screen bg-[#f5f8f5]">
+    <div className="md:flex md:h-screen bg-[#f5f8f5]">
       <Navbar role="coach" name={name} />
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto pt-20 px-4 pb-10 md:p-8">
         {children}
       </main>
     </div>

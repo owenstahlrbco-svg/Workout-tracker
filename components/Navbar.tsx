@@ -1,11 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Dumbbell, LayoutDashboard, TrendingUp, CalendarDays, FileText,
-  Users, LogOut, MessageCircle, Inbox, Library,
+  Users, LogOut, MessageCircle, Inbox, Library, Menu, X,
 } from 'lucide-react'
 
 interface NavbarProps {
@@ -17,6 +18,7 @@ export default function Navbar({ role, name }: NavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  const [open, setOpen] = useState(false)
 
   async function handleSignOut() {
     await supabase.auth.signOut()
@@ -67,8 +69,8 @@ export default function Navbar({ role, name }: NavbarProps) {
 
   const sections = role === 'coach' ? coachSections : clientSections
 
-  return (
-    <aside className="w-64 bg-emerald-950 text-white flex flex-col h-screen sticky top-0 flex-shrink-0">
+  const navBody = (
+    <>
       <div className="px-6 pt-7 pb-6 border-b border-white/10">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-emerald-400">Pitch HQ</p>
         <p className="font-display text-2xl font-semibold text-white mt-0.5">Dashboard</p>
@@ -93,6 +95,7 @@ export default function Navbar({ role, name }: NavbarProps) {
                   <Link
                     key={href}
                     href={href}
+                    onClick={() => setOpen(false)}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                       active
                         ? 'bg-white text-emerald-950 shadow-sm'
@@ -118,6 +121,51 @@ export default function Navbar({ role, name }: NavbarProps) {
           Sign Out
         </button>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobile top bar — only below md */}
+      <header className="md:hidden fixed top-0 inset-x-0 z-40 flex items-center justify-between bg-emerald-950 text-white h-14 px-4">
+        <div className="flex items-baseline gap-2">
+          <span className="text-[9px] font-semibold uppercase tracking-[0.28em] text-emerald-400">Pitch HQ</span>
+          <span className="font-display text-lg font-semibold">Dashboard</span>
+        </div>
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Open menu"
+          className="p-2 -mr-2 rounded-lg hover:bg-white/10 transition-colors"
+        >
+          <Menu size={22} />
+        </button>
+      </header>
+
+      {/* Mobile drawer + backdrop */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          <div
+            className="absolute inset-0 bg-emerald-950/50"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+          <aside className="relative w-72 max-w-[82%] bg-emerald-950 text-white flex flex-col h-full shadow-2xl">
+            <button
+              onClick={() => setOpen(false)}
+              aria-label="Close menu"
+              className="absolute top-4 right-4 z-10 p-2 rounded-lg text-emerald-100/70 hover:text-white hover:bg-white/10 transition-colors"
+            >
+              <X size={20} />
+            </button>
+            {navBody}
+          </aside>
+        </div>
+      )}
+
+      {/* Desktop sidebar — md and up */}
+      <aside className="hidden md:flex w-64 bg-emerald-950 text-white flex-col h-screen sticky top-0 flex-shrink-0">
+        {navBody}
+      </aside>
+    </>
   )
 }
