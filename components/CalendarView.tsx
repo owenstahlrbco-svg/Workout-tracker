@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday } from 'date-fns'
-import { ChevronLeft, ChevronRight, Dumbbell, FileText } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Dumbbell, FileText, Trash2 } from 'lucide-react'
 import { parseDate } from '@/lib/dates'
 
 interface Workout {
@@ -16,6 +18,7 @@ interface ProgramDay {
   id: string
   date: string
   content: string
+  programs?: { title: string }
 }
 
 interface Props {
@@ -23,15 +26,32 @@ interface Props {
   programDays: ProgramDay[]
 }
 
-export default function CalendarView({ workouts, programDays }: Props) {
+export default function CalendarView({ workouts, programDays: allProgramDays }: Props) {
   const [current, setCurrent] = useState(new Date())
   const [selected, setSelected] = useState<Date | null>(null)
+  const [removedIds, setRemovedIds] = useState<string[]>([])
+  const [removing, setRemoving] = useState(false)
+  const router = useRouter()
+  const supabase = createClient()
+
+  const programDays = allProgramDays.filter(p => !removedIds.includes(p.id))
 
   const days = eachDayOfInterval({ start: startOfMonth(current), end: endOfMonth(current) })
   const startDow = startOfMonth(current).getDay()
 
   const selectedWorkout = selected ? workouts.find(w => isSameDay(parseDate(w.date), selected)) : null
   const selectedProgram = selected ? programDays.find(p => isSameDay(parseDate(p.date), selected)) : null
+
+  async function removeProgramDay(id: string) {
+    if (removing) return
+    setRemoving(true)
+    const { error } = await supabase.from('program_days').delete().eq('id', id)
+    if (!error) {
+      setRemovedIds(ids => [...ids, id])
+      router.refresh()
+    }
+    setRemoving(false)
+  }
 
   return (
     <div className="space-y-4">
@@ -143,8 +163,21 @@ export default function CalendarView({ workouts, programDays }: Props) {
 
           {selectedProgram && (
             <div>
-              <div className="flex items-center gap-2 text-amber-600 text-sm font-semibold mb-2">
-                <FileText size={15} /> Programmed Session
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2 text-amber-600 text-sm font-semibold">
+                  <FileText size={15} /> Programmed Session
+                  {selectedProgram.programs?.title && (
+                    <span className="text-emerald-950/45 font-normal">· {selectedProgram.programs.title}</span>
+                  )}
+                </div>
+                <button
+                  onClick={() => removeProgramDay(selectedProgram.id)}
+                  disabled={removing}
+                  className="flex items-center gap-1.5 text-xs font-medium text-emerald-950/40 hover:text-red-500 disabled:opacity-50 transition-colors"
+                >
+                  <Trash2 size={13} />
+                  {removing ? 'Removing...' : 'Remove from calendar'}
+                </button>
               </div>
               <div className="bg-emerald-900/5 rounded-xl p-4 text-emerald-950/80 text-sm whitespace-pre-wrap">
                 {selectedProgram.content}

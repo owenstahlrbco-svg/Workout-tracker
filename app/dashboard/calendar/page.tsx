@@ -14,7 +14,7 @@ export default async function CalendarPage() {
 
   const { data: programDays } = await supabase
     .from('program_days')
-    .select('*, programs!inner(user_id)')
+    .select('*, programs!inner(user_id, title)')
     .eq('programs.user_id', user.id)
 
   return (

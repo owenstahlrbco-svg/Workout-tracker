@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { FileText, Plus, Trash2, Save } from 'lucide-react'
-import { format } from 'date-fns'
+import { FileText, Plus, Trash2, Save, Lightbulb } from 'lucide-react'
+import { format, addDays } from 'date-fns'
 
 interface ProgramDay {
   date: string
+  label: string
   content: string
 }
 
@@ -19,10 +20,20 @@ interface SavedProgram {
 
 const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
 
+// A line counts as a day heading when it starts with "Day X" or a weekday
+// name (after stripping bullets/markdown), and isn't a long sentence.
+function isDayHeading(line: string): boolean {
+  const l = line.trim().replace(/^[#*\-•>\s]+/, '')
+  if (l.length === 0 || l.length > 60) return false
+  return /^(day\s*[a-z0-9]+|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b/i.test(l)
+}
+
 export default function ImportPage() {
   const [title, setTitle] = useState('')
   const [rawText, setRawText] = useState('')
   const [days, setDays] = useState<ProgramDay[]>([])
+  const [intro, setIntro] = useState('')
+  const [usedFallback, setUsedFallback] = useState(false)
   const [step, setStep] = useState<'input' | 'assign'>('input')
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -45,23 +56,45 @@ export default function ImportPage() {
     load()
   }, [success]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function parseIntoWeek() {
+  function parseIntoDays() {
     if (!rawText.trim()) return
-    const lines = rawText.split('\n').filter(l => l.trim())
-    const chunkSize = Math.ceil(lines.length / 5)
-    const parsed: ProgramDay[] = []
+    const lines = rawText.split('\n').map(l => l.replace(/\s+$/, '')).filter(l => l.trim())
+
+    // Split on day headings: everything before the first heading is intro,
+    // each heading starts a new day block.
+    const blocks: { label: string; lines: string[] }[] = []
+    const introLines: string[] = []
+    for (const line of lines) {
+      if (isDayHeading(line)) {
+        blocks.push({ label: line.trim().replace(/^[#*\-•>\s]+/, ''), lines: [line.trim()] })
+      } else if (blocks.length === 0) {
+        introLines.push(line)
+      } else {
+        blocks[blocks.length - 1].lines.push(line)
+      }
+    }
+
     const today = new Date()
 
-    for (let i = 0; i < 5; i++) {
-      const chunk = lines.slice(i * chunkSize, (i + 1) * chunkSize)
-      const d = new Date(today)
-      d.setDate(today.getDate() + i)
-      parsed.push({
-        date: format(d, 'yyyy-MM-dd'),
-        content: chunk.join('\n'),
-      })
+    if (blocks.length > 0) {
+      setUsedFallback(false)
+      setIntro(introLines.join('\n'))
+      setDays(blocks.map((b, i) => ({
+        date: format(addDays(today, i), 'yyyy-MM-dd'),
+        label: b.label,
+        content: b.lines.join('\n'),
+      })))
+    } else {
+      // No "Day A" / weekday headings found — fall back to an even split.
+      setUsedFallback(true)
+      setIntro('')
+      const chunkSize = Math.ceil(lines.length / 5)
+      setDays(Array.from({ length: 5 }, (_, i) => ({
+        date: format(addDays(today, i), 'yyyy-MM-dd'),
+        label: `Day ${i + 1}`,
+        content: lines.slice(i * chunkSize, (i + 1) * chunkSize).join('\n'),
+      })).filter(d => d.content.trim()))
     }
-    setDays(parsed)
     setStep('assign')
   }
 
@@ -104,8 +137,10 @@ export default function ImportPage() {
     router.push('/dashboard/calendar')
   }
 
-  async function deleteProgram(id: string) {
-    await supabase.from('programs').delete().eq('id', id)
+  async function deleteProgram(id: string, programTitle: string) {
+    if (!window.confirm(`Delete “${programTitle}”? This also removes all of its workout days from your calendar.`)) return
+    const { error: dErr } = await supabase.from('programs').delete().eq('id', id)
+    if (dErr) { setError(dErr.message); return }
     setPrograms(programs.filter(p => p.id !== id))
   }
 
@@ -122,7 +157,7 @@ export default function ImportPage() {
 
       {success && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-800">
-          Plan saved to your Saved Plans below. To get workouts onto your calendar, use &ldquo;Place on Calendar Days&rdquo;.
+          Plan saved to your Saved Plans below. To get workouts onto your calendar, use &ldquo;Split into Days&rdquo;.
         </div>
       )}
       {error && (
@@ -132,64 +167,79 @@ export default function ImportPage() {
       )}
 
       {step === 'input' && (
-        <div className="bg-white border border-emerald-900/10 rounded-3xl p-6 space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-emerald-950 mb-1.5">Plan Title</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Week 4 — Strength Block"
-              className={inputClass}
-            />
+        <>
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex gap-3">
+            <Lightbulb size={18} className="text-emerald-700 flex-shrink-0 mt-0.5" />
+            <div className="text-sm text-emerald-900">
+              <p className="font-semibold">How to format your doc so days split perfectly</p>
+              <p className="mt-1 text-emerald-900/80">
+                Start each training day on its own line: <span className="font-semibold">Day A</span>,{' '}
+                <span className="font-semibold">Day B</span>, <span className="font-semibold">Day 1</span>, or a weekday
+                like <span className="font-semibold">Monday</span>. Everything under that line belongs to that day.
+                Intro text before your first day is set aside automatically — it won&apos;t be scheduled as a workout.
+              </p>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-emerald-950 mb-1.5">
-              Paste Plan Content
-            </label>
-            <p className="text-emerald-950/45 text-xs mb-2">
-              Open your Google Doc → Select All → Copy → Paste here. Works with any plan from Owen or Skool.
-            </p>
-            <textarea
-              value={rawText}
-              onChange={(e) => setRawText(e.target.value)}
-              rows={12}
-              placeholder="Paste your plan here..."
-              className={`${inputClass} py-3 font-mono text-sm resize-none`}
-            />
-          </div>
+          <div className="bg-white border border-emerald-900/10 rounded-3xl p-6 space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-emerald-950 mb-1.5">Plan Title</label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="e.g. Week 4 — Strength Block"
+                className={inputClass}
+              />
+            </div>
 
-          <div className="flex gap-3">
-            <button
-              onClick={parseIntoWeek}
-              disabled={!rawText.trim()}
-              className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-40 text-white font-semibold rounded-xl px-5 py-2.5 transition-colors"
-            >
-              <FileText size={16} /> Place on Calendar Days
-            </button>
-            <button
-              onClick={async () => {
-                if (!title.trim() || !rawText.trim()) { setError('Add a title and content first.'); return }
-                setSaving(true)
-                setError('')
-                const { data: { user } } = await supabase.auth.getUser()
-                if (!user) { setError('Not signed in'); setSaving(false); return }
-                const { error: sErr } = await supabase.from('programs').insert({ user_id: user.id, title, content: rawText })
-                setSaving(false)
-                if (sErr) { setError(sErr.message); return }
-                setSuccess(true)
-                setTitle('')
-                setRawText('')
-                setTimeout(() => setSuccess(false), 3000)
-              }}
-              disabled={saving || !rawText.trim()}
-              className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 disabled:opacity-40 text-emerald-950 font-medium rounded-xl px-5 py-2.5 transition-colors"
-            >
-              <Save size={16} /> Save as-is
-            </button>
+            <div>
+              <label className="block text-sm font-medium text-emerald-950 mb-1.5">
+                Paste Plan Content
+              </label>
+              <p className="text-emerald-950/45 text-xs mb-2">
+                Open your Google Doc → Select All → Copy → Paste here.
+              </p>
+              <textarea
+                value={rawText}
+                onChange={(e) => setRawText(e.target.value)}
+                rows={12}
+                placeholder={"My 3-Day Strength Plan\nWelcome! Here's how the block works...\n\nDay A\nBack Squat 5x5\nBench Press 3x8\n\nDay B\nDeadlift 5x3\nPull-ups 4x8\n\nDay C\nOverhead Press 5x5\nRows 4x10"}
+                className={`${inputClass} py-3 font-mono text-sm resize-none`}
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={parseIntoDays}
+                disabled={!rawText.trim()}
+                className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-40 text-white font-semibold rounded-xl px-5 py-2.5 transition-colors"
+              >
+                <FileText size={16} /> Split into Days
+              </button>
+              <button
+                onClick={async () => {
+                  if (!title.trim() || !rawText.trim()) { setError('Add a title and content first.'); return }
+                  setSaving(true)
+                  setError('')
+                  const { data: { user } } = await supabase.auth.getUser()
+                  if (!user) { setError('Not signed in'); setSaving(false); return }
+                  const { error: sErr } = await supabase.from('programs').insert({ user_id: user.id, title, content: rawText })
+                  setSaving(false)
+                  if (sErr) { setError(sErr.message); return }
+                  setSuccess(true)
+                  setTitle('')
+                  setRawText('')
+                  setTimeout(() => setSuccess(false), 3000)
+                }}
+                disabled={saving || !rawText.trim()}
+                className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 disabled:opacity-40 text-emerald-950 font-medium rounded-xl px-5 py-2.5 transition-colors"
+              >
+                <Save size={16} /> Save as-is
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {step === 'assign' && (
@@ -205,15 +255,25 @@ export default function ImportPage() {
               </button>
             </div>
             <p className="text-emerald-950/55 text-sm">
-              We split your plan into {days.length} days. Pick the exact date for each workout —
-              they&apos;ll pop up on your calendar on those days.
+              {usedFallback
+                ? <>We couldn&apos;t find day headings like &ldquo;Day A&rdquo; in your doc, so we split it evenly — check each day and fix anything that landed wrong, or go back and add headings.</>
+                : <>We found {days.length} training {days.length === 1 ? 'day' : 'days'} in your plan. Pick the exact date for each — they&apos;ll pop up on your calendar on those days.</>}
             </p>
           </div>
+
+          {intro && (
+            <div className="bg-emerald-900/5 border border-emerald-900/10 rounded-3xl p-5">
+              <p className="text-emerald-950/60 text-xs font-semibold uppercase tracking-wider mb-2">
+                Set aside — intro / notes (won&apos;t be scheduled)
+              </p>
+              <p className="text-emerald-950/60 text-sm whitespace-pre-wrap line-clamp-4">{intro}</p>
+            </div>
+          )}
 
           {days.map((day, i) => (
             <div key={i} className="bg-white border border-emerald-900/10 rounded-3xl p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-emerald-950/75 font-semibold text-sm">Day {i + 1}</span>
+                <span className="text-emerald-950 font-semibold text-sm">{day.label || `Day ${i + 1}`}</span>
                 <button onClick={() => removeDay(i)} className="text-emerald-950/30 hover:text-red-500 transition-colors">
                   <Trash2 size={15} />
                 </button>
@@ -235,7 +295,7 @@ export default function ImportPage() {
 
           <div className="flex gap-3">
             <button
-              onClick={() => setDays([...days, { date: format(new Date(), 'yyyy-MM-dd'), content: '' }])}
+              onClick={() => setDays([...days, { date: format(new Date(), 'yyyy-MM-dd'), label: `Day ${days.length + 1}`, content: '' }])}
               className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 text-emerald-950 rounded-xl px-4 py-2.5 text-sm transition-colors"
             >
               <Plus size={15} /> Add Another Day
@@ -260,6 +320,9 @@ export default function ImportPage() {
         <div className="bg-white border border-emerald-900/10 rounded-3xl overflow-hidden">
           <div className="p-5 border-b border-emerald-900/10">
             <h2 className="font-display text-lg font-semibold text-emerald-950">Saved Plans</h2>
+            <p className="text-emerald-950/45 text-xs mt-0.5">
+              Deleting a plan also removes its workout days from your calendar — the clean way to swap in a new program.
+            </p>
           </div>
           <div className="divide-y divide-emerald-900/10">
             {programs.map(p => (
@@ -269,10 +332,10 @@ export default function ImportPage() {
                   <p className="text-emerald-950/45 text-xs">{format(new Date(p.created_at), 'MMM d, yyyy')}</p>
                 </div>
                 <button
-                  onClick={() => deleteProgram(p.id)}
-                  className="text-emerald-950/30 hover:text-red-500 transition-colors"
+                  onClick={() => deleteProgram(p.id, p.title)}
+                  className="flex items-center gap-1.5 text-xs font-medium text-emerald-950/40 hover:text-red-500 transition-colors"
                 >
-                  <Trash2 size={15} />
+                  <Trash2 size={14} /> Delete plan
                 </button>
               </div>
             ))}
