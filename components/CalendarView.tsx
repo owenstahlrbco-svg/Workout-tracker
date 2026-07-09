@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, isToday } from 'date-fns'
 import { ChevronLeft, ChevronRight, Dumbbell, FileText } from 'lucide-react'
+import { parseDate } from '@/lib/dates'
 
 interface Workout {
   id: string
@@ -29,8 +30,8 @@ export default function CalendarView({ workouts, programDays }: Props) {
   const days = eachDayOfInterval({ start: startOfMonth(current), end: endOfMonth(current) })
   const startDow = startOfMonth(current).getDay()
 
-  const selectedWorkout = selected ? workouts.find(w => isSameDay(new Date(w.date), selected)) : null
-  const selectedProgram = selected ? programDays.find(p => isSameDay(new Date(p.date), selected)) : null
+  const selectedWorkout = selected ? workouts.find(w => isSameDay(parseDate(w.date), selected)) : null
+  const selectedProgram = selected ? programDays.find(p => isSameDay(parseDate(p.date), selected)) : null
 
   return (
     <div className="space-y-4">
@@ -77,8 +78,8 @@ export default function CalendarView({ workouts, programDays }: Props) {
           ))}
 
           {days.map(day => {
-            const hasWorkout = workouts.some(w => isSameDay(new Date(w.date), day))
-            const hasProgram = programDays.some(p => isSameDay(new Date(p.date), day))
+            const hasWorkout = workouts.some(w => isSameDay(parseDate(w.date), day))
+            const hasProgram = programDays.some(p => isSameDay(parseDate(p.date), day))
             const isSelected = selected ? isSameDay(day, selected) : false
             const todayDay = isToday(day)
 

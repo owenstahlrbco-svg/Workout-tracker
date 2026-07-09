@@ -27,6 +27,18 @@ function newRow(): ExerciseRow {
   return { id: crypto.randomUUID(), exercise_name: '', sets: '', reps: '', weight: '', unit: 'lbs', notes: '' }
 }
 
+function Highlight({ name, q }: { name: string; q: string }) {
+  const i = q ? name.toLowerCase().indexOf(q) : -1
+  if (i === -1) return <>{name}</>
+  return (
+    <>
+      {name.slice(0, i)}
+      <span className="font-bold text-emerald-700">{name.slice(i, i + q.length)}</span>
+      {name.slice(i + q.length)}
+    </>
+  )
+}
+
 function ExerciseInput({ value, onChange, exercises }: {
   value: string
   onChange: (val: string) => void
@@ -35,9 +47,19 @@ function ExerciseInput({ value, onChange, exercises }: {
   const [open, setOpen] = useState(false)
   const [query, setQuery] = useState(value)
 
-  const filtered = query.trim().length === 0
+  const q = query.trim().toLowerCase()
+
+  // Matches anywhere in the name; names that START with the query rank first,
+  // so "bac" puts Back Squat at the top instantly.
+  const filtered = q.length === 0
     ? exercises
-    : exercises.filter(e => e.name.toLowerCase().includes(query.toLowerCase()))
+    : exercises
+        .filter(e => e.name.toLowerCase().includes(q))
+        .sort((a, b) => {
+          const ap = a.name.toLowerCase().startsWith(q) ? 0 : 1
+          const bp = b.name.toLowerCase().startsWith(q) ? 0 : 1
+          return ap - bp || a.name.localeCompare(b.name)
+        })
 
   const categories = [...new Set(filtered.map(e => e.category))]
 
@@ -52,7 +74,7 @@ function ExerciseInput({ value, onChange, exercises }: {
       <input
         type="text"
         value={query}
-        placeholder="Tap to search exercises..."
+        placeholder="Type to search — e.g. “bac” finds Back Squat"
         onFocus={() => setOpen(true)}
         onBlur={() => setTimeout(() => setOpen(false), 200)}
         onChange={e => {
@@ -64,24 +86,44 @@ function ExerciseInput({ value, onChange, exercises }: {
       />
       {open && filtered.length > 0 && (
         <div className="absolute z-50 mt-1 w-full bg-white border border-emerald-900/15 rounded-xl shadow-xl max-h-60 overflow-y-auto">
-          {categories.map(cat => (
-            <div key={cat}>
-              <div className="px-3 py-1.5 text-xs font-semibold text-emerald-700 uppercase tracking-wide bg-emerald-50 sticky top-0">
-                {cat}
+          {q.length > 0 ? (
+            filtered.map(e => (
+              <button
+                key={e.name}
+                type="button"
+                onMouseDown={ev => { ev.preventDefault(); select(e.name) }}
+                onTouchEnd={ev => { ev.preventDefault(); select(e.name) }}
+                className="w-full flex items-center justify-between gap-3 text-left px-4 py-2.5 text-sm text-emerald-950 hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
+              >
+                <span><Highlight name={e.name} q={q} /></span>
+                <span className="text-[10px] uppercase tracking-wide text-emerald-950/40 flex-shrink-0">{e.category}</span>
+              </button>
+            ))
+          ) : (
+            categories.map(cat => (
+              <div key={cat}>
+                <div className="px-3 py-1.5 text-xs font-semibold text-emerald-700 uppercase tracking-wide bg-emerald-50 sticky top-0">
+                  {cat}
+                </div>
+                {filtered.filter(e => e.category === cat).map(e => (
+                  <button
+                    key={e.name}
+                    type="button"
+                    onMouseDown={ev => { ev.preventDefault(); select(e.name) }}
+                    onTouchEnd={ev => { ev.preventDefault(); select(e.name) }}
+                    className="w-full text-left px-4 py-2.5 text-sm text-emerald-950 hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
+                  >
+                    {e.name}
+                  </button>
+                ))}
               </div>
-              {filtered.filter(e => e.category === cat).map(e => (
-                <button
-                  key={e.name}
-                  type="button"
-                  onMouseDown={ev => { ev.preventDefault(); select(e.name) }}
-                  onTouchEnd={ev => { ev.preventDefault(); select(e.name) }}
-                  className="w-full text-left px-4 py-2.5 text-sm text-emerald-950 hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
-                >
-                  {e.name}
-                </button>
-              ))}
-            </div>
-          ))}
+            ))
+          )}
+        </div>
+      )}
+      {open && q.length > 0 && filtered.length === 0 && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-emerald-900/15 rounded-xl shadow-xl px-4 py-3 text-sm text-emerald-950/50">
+          No match — keep typing to use &ldquo;{query}&rdquo; as a custom exercise.
         </div>
       )}
     </div>

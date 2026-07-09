@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { Dumbbell, TrendingUp, CalendarDays, FileText, ChevronRight, MessageCircle, Flame } from 'lucide-react'
+import { parseDate } from '@/lib/dates'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -98,7 +99,7 @@ export default async function DashboardPage() {
         <div className="bg-white rounded-2xl p-6 border border-emerald-900/10">
           <p className="text-emerald-950/55 text-sm">Last Workout</p>
           <p className="font-display text-2xl font-semibold text-emerald-950 mt-1">
-            {recentWorkouts?.[0] ? format(new Date(recentWorkouts[0].date), 'MMM d') : '—'}
+            {recentWorkouts?.[0] ? format(parseDate(recentWorkouts[0].date), 'MMM d') : '—'}
           </p>
           <p className="text-emerald-950/40 text-xs mt-1">
             {recentWorkouts?.[0]?.workout_sets?.length ?? 0} exercises
@@ -145,7 +146,7 @@ export default async function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-emerald-950 font-semibold">
-                      {format(new Date(workout.date), 'EEEE, MMMM d')}
+                      {format(parseDate(workout.date), 'EEEE, MMMM d')}
                     </p>
                     <p className="text-emerald-950/55 text-sm mt-0.5">
                       {workout.workout_sets?.length ?? 0} exercises

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { FileText, Plus, Trash2, Save } from 'lucide-react'
 import { format } from 'date-fns'
@@ -28,6 +29,7 @@ export default function ImportPage() {
   const [error, setError] = useState('')
   const [programs, setPrograms] = useState<SavedProgram[]>([])
   const supabase = createClient()
+  const router = useRouter()
 
   useEffect(() => {
     async function load() {
@@ -98,13 +100,8 @@ export default function ImportPage() {
       if (dErr) { setError(dErr.message); setSaving(false); return }
     }
 
-    setSuccess(true)
-    setTitle('')
-    setRawText('')
-    setDays([])
-    setStep('input')
-    setSaving(false)
-    setTimeout(() => setSuccess(false), 3000)
+    // Show the result where it matters — on the calendar
+    router.push('/dashboard/calendar')
   }
 
   async function deleteProgram(id: string) {
@@ -125,7 +122,7 @@ export default function ImportPage() {
 
       {success && (
         <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-800">
-          Plan saved! Your workouts now appear on your calendar.
+          Plan saved to your Saved Plans below. To get workouts onto your calendar, use &ldquo;Place on Calendar Days&rdquo;.
         </div>
       )}
       {error && (
@@ -175,13 +172,15 @@ export default function ImportPage() {
               onClick={async () => {
                 if (!title.trim() || !rawText.trim()) { setError('Add a title and content first.'); return }
                 setSaving(true)
+                setError('')
                 const { data: { user } } = await supabase.auth.getUser()
-                if (!user) return
-                await supabase.from('programs').insert({ user_id: user.id, title, content: rawText })
+                if (!user) { setError('Not signed in'); setSaving(false); return }
+                const { error: sErr } = await supabase.from('programs').insert({ user_id: user.id, title, content: rawText })
+                setSaving(false)
+                if (sErr) { setError(sErr.message); return }
                 setSuccess(true)
                 setTitle('')
                 setRawText('')
-                setSaving(false)
                 setTimeout(() => setSuccess(false), 3000)
               }}
               disabled={saving || !rawText.trim()}
@@ -239,7 +238,7 @@ export default function ImportPage() {
               onClick={() => setDays([...days, { date: format(new Date(), 'yyyy-MM-dd'), content: '' }])}
               className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 text-emerald-950 rounded-xl px-4 py-2.5 text-sm transition-colors"
             >
-              <Plus size={15} /> Add Day
+              <Plus size={15} /> Add Another Day
             </button>
             <button
               onClick={handleSave}
@@ -250,6 +249,9 @@ export default function ImportPage() {
               {saving ? 'Saving...' : 'Save to Calendar'}
             </button>
           </div>
+          <p className="text-emerald-950/45 text-xs">
+            Nothing is on your calendar until you press <span className="font-semibold text-emerald-950/70">Save to Calendar</span>.
+          </p>
         </div>
       )}
 

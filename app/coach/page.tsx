@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { format, subDays, differenceInDays } from 'date-fns'
 import { Users, ChevronRight, Dumbbell, MapPin, Wifi, GraduationCap } from 'lucide-react'
+import { parseDate } from '@/lib/dates'
 
 interface Workout {
   id: string
@@ -46,7 +47,7 @@ export default async function CoachPage() {
   function activityStatus(clientId: string): { color: string; label: string } {
     const last = clientWorkouts(clientId)[0]
     if (!last) return { color: 'bg-red-400', label: 'Never logged' }
-    const days = differenceInDays(new Date(), new Date(last.date))
+    const days = differenceInDays(new Date(), parseDate(last.date))
     if (days <= 7) return { color: 'bg-emerald-500', label: 'Active this week' }
     if (days <= 14) return { color: 'bg-amber-400', label: `Quiet ${days} days` }
     return { color: 'bg-red-400', label: `Inactive ${days} days` }
@@ -144,7 +145,7 @@ export default async function CoachPage() {
                             : `${week.doneCount} this week`}
                         </p>
                         <p className="text-emerald-950/45 mt-0.5">
-                          {all.length} total · {last ? `last ${format(new Date(last.date), 'MMM d')}` : 'no workouts'}
+                          {all.length} total · {last ? `last ${format(parseDate(last.date), 'MMM d')}` : 'no workouts'}
                         </p>
                       </div>
                       <ChevronRight size={16} className="text-emerald-950/30 group-hover:text-emerald-700 transition-colors flex-shrink-0" />
@@ -177,7 +178,7 @@ export default async function CoachPage() {
                     <span className="text-emerald-950/50 text-sm"> logged a workout</span>
                   </div>
                   <span className="text-emerald-950/45 text-xs flex-shrink-0">
-                    {format(new Date(workout.date), 'MMM d')}
+                    {format(parseDate(workout.date), 'MMM d')}
                   </span>
                 </div>
               )

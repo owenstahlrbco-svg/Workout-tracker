@@ -4,6 +4,7 @@ import { format, subDays } from 'date-fns'
 import Link from 'next/link'
 import { ArrowLeft, Dumbbell, MessageCircle, CheckCircle2, XCircle } from 'lucide-react'
 import ClientTypeSelect from '@/components/ClientTypeSelect'
+import { parseDate } from '@/lib/dates'
 
 export default async function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -101,7 +102,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                     : <XCircle size={18} className="text-red-400 flex-shrink-0" />}
                   <div className="flex-1 min-w-0">
                     <p className="text-emerald-950 text-sm font-medium">
-                      {format(new Date(day.date), 'EEEE, MMM d')} · {day.programs?.title}
+                      {format(parseDate(day.date), 'EEEE, MMM d')} · {day.programs?.title}
                     </p>
                     <p className="text-emerald-950/50 text-xs truncate">{day.content?.split('\n')[0]}</p>
                   </div>
@@ -143,7 +144,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               <div key={workout.id} className="bg-white border border-emerald-900/10 rounded-2xl p-5">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-emerald-950 font-semibold">
-                    {format(new Date(workout.date), 'EEEE, MMMM d, yyyy')}
+                    {format(parseDate(workout.date), 'EEEE, MMMM d, yyyy')}
                   </p>
                   <p className="text-emerald-950/50 text-sm">
                     {workout.workout_sets?.reduce((s: number, set: { sets: number; reps: number; weight: number }) => s + set.sets * set.reps * set.weight, 0).toLocaleString()} lbs

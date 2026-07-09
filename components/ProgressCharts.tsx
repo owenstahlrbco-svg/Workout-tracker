@@ -6,6 +6,7 @@ import {
 } from 'recharts'
 import { format } from 'date-fns'
 import { TrendingUp } from 'lucide-react'
+import { parseDate } from '@/lib/dates'
 
 interface Set {
   id: string
@@ -37,7 +38,7 @@ export default function ProgressCharts({ sets, exercises }: Props) {
   const chartData = Object.entries(byDate)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, weight]) => ({
-      date: format(new Date(date), 'MMM d'),
+      date: format(parseDate(date), 'MMM d'),
       weight,
     }))
 
