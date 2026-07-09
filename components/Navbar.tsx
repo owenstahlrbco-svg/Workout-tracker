@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Dumbbell, LayoutDashboard, TrendingUp, CalendarDays, FileText,
-  Users, LogOut, MessageCircle, Inbox,
+  Users, LogOut, MessageCircle, Inbox, Library,
 } from 'lucide-react'
 
 interface NavbarProps {
@@ -54,6 +54,7 @@ export default function Navbar({ role, name }: NavbarProps) {
       links: [
         { href: '/coach', label: 'Clients', icon: Users },
         { href: '/coach/messages', label: 'Messages', icon: Inbox },
+        { href: '/coach/library', label: 'Exercise Library', icon: Library },
       ],
     },
     {
