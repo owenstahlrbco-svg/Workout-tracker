@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { FileText, Plus, Trash2, Save, Lightbulb, Repeat, CalendarDays } from 'lucide-react'
-import { format, addDays, addWeeks } from 'date-fns'
+import { FileText, Plus, Trash2, Save, Lightbulb, Repeat, CalendarDays, Check } from 'lucide-react'
+import { format, addDays, addWeeks, differenceInCalendarDays } from 'date-fns'
 import { parseDate } from '@/lib/dates'
 
 interface ProgramDay {
@@ -18,6 +18,12 @@ interface SavedProgram {
   id: string
   title: string
   created_at: string
+}
+
+interface PlanDayRow {
+  program_id: string
+  date: string
+  content: string
 }
 
 const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
@@ -52,6 +58,8 @@ export default function ImportPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
   const [programs, setPrograms] = useState<SavedProgram[]>([])
+  const [planDays, setPlanDays] = useState<PlanDayRow[]>([])
+  const [workoutDates, setWorkoutDates] = useState<Set<string>>(new Set())
   const supabase = createClient()
   const router = useRouter()
 
@@ -59,12 +67,25 @@ export default function ImportPage() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data } = await supabase
-        .from('programs')
-        .select('id, title, created_at')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
+      const [{ data }, { data: dayRows }, { data: workoutRows }] = await Promise.all([
+        supabase
+          .from('programs')
+          .select('id, title, created_at')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('program_days')
+          .select('program_id, date, content, programs!inner(user_id)')
+          .eq('programs.user_id', user.id)
+          .order('date', { ascending: true }),
+        supabase
+          .from('workouts')
+          .select('date')
+          .eq('user_id', user.id),
+      ])
       setPrograms(data ?? [])
+      setPlanDays((dayRows ?? []).map(d => ({ program_id: d.program_id, date: d.date, content: d.content })))
+      setWorkoutDates(new Set((workoutRows ?? []).map(w => w.date)))
     }
     load()
   }, [success]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -148,6 +169,47 @@ export default function ImportPage() {
   const preview = mode === 'weekly' ? weeklyEntries() : []
   const anyWeekdaySelected = days.some(d => d.weekdays.length > 0)
 
+  // Plans in Progress — the current-block card + day checklist from the demo,
+  // driven by this athlete's real programs, scheduled days, and logged workouts.
+  const plansInProgress = programs
+    .map(p => {
+      const scheduled = planDays.filter(d => d.program_id === p.id)
+      if (scheduled.length === 0) return null
+      const first = parseDate(scheduled[0].date)
+      const last = parseDate(scheduled[scheduled.length - 1].date)
+      const today = new Date()
+      if (differenceInCalendarDays(today, last) > 0) return null // block already finished
+      const totalWeeks = Math.max(1, Math.ceil((differenceInCalendarDays(last, first) + 1) / 7))
+      const currentWeek = Math.min(totalWeeks, Math.max(1, Math.floor(differenceInCalendarDays(today, first) / 7) + 1))
+      const completed = scheduled.filter(d => workoutDates.has(d.date)).length
+      const pct = Math.round((completed / scheduled.length) * 100)
+      const weekStart = addDays(first, (currentWeek - 1) * 7)
+      const weekEnd = addDays(weekStart, 6)
+
+      // One card per unique training day (Day A / Day B / Monday…); a day is
+      // checked off when a workout was logged on its date this program week.
+      const templates: { label: string; exercises: string[]; done: boolean }[] = []
+      const seen = new Map<string, number>()
+      for (const d of scheduled) {
+        const lines = d.content.split('\n').map(l => l.trim()).filter(Boolean)
+        const hasHeading = lines.length > 0 && isDayHeading(lines[0])
+        const label = hasHeading ? lines[0] : 'Session'
+        const exercises = hasHeading ? lines.slice(1) : lines
+        const dDate = parseDate(d.date)
+        const inWeek = differenceInCalendarDays(dDate, weekStart) >= 0 && differenceInCalendarDays(weekEnd, dDate) >= 0
+        const done = inWeek && workoutDates.has(d.date)
+        const idx = seen.get(label)
+        if (idx === undefined) {
+          seen.set(label, templates.length)
+          templates.push({ label, exercises, done })
+        } else if (done) {
+          templates[idx].done = true
+        }
+      }
+      return { id: p.id, title: p.title, totalWeeks, currentWeek, pct, templates }
+    })
+    .filter((p): p is NonNullable<typeof p> => p !== null)
+
   async function handleSave() {
     setSaving(true)
     setError('')
@@ -195,12 +257,10 @@ export default function ImportPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Your Plans</p>
-        <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1">Import a Plan</h1>
-        <p className="text-emerald-950/55 mt-2">
-          Got a Google Doc from Owen or the Skool community? Paste it here, choose which days of the
-          week you train, and your whole block lands on the calendar automatically.
-        </p>
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Plan &amp; Progress</p>
+        <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1 flex items-center gap-2.5">
+          <FileText size={28} className="text-emerald-700" /> My Plans
+        </h1>
       </div>
 
       {success && (
@@ -230,6 +290,13 @@ export default function ImportPage() {
           </div>
 
           <div className="bg-white border border-emerald-900/10 rounded-3xl p-6 space-y-4">
+            <div>
+              <h2 className="font-display text-lg font-semibold text-emerald-950">Import a Plan</h2>
+              <p className="text-emerald-950/55 text-sm mt-1">
+                Paste a program from Owen or the Skool community — choose which days you train and the
+                dashboard builds your calendar automatically.
+              </p>
+            </div>
             <div>
               <label className="block text-sm font-medium text-emerald-950 mb-1.5">Plan Title</label>
               <input
@@ -442,6 +509,55 @@ export default function ImportPage() {
           <p className="text-emerald-950/45 text-xs">
             Nothing is on your calendar until you press <span className="font-semibold text-emerald-950/70">Save to Calendar</span>.
           </p>
+        </div>
+      )}
+
+      {/* Plans in Progress — mirrors the demo dashboard's My Plans view */}
+      {step === 'input' && plansInProgress.length > 0 && (
+        <div className="space-y-4">
+          <h2 className="font-display text-xl font-semibold text-emerald-950">Plans in Progress</h2>
+          {plansInProgress.map(plan => (
+            <div key={plan.id} className="space-y-3">
+              <div className="bg-white border border-emerald-900/10 rounded-3xl p-5 md:p-6">
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700">{plan.title}</p>
+                    <h3 className="font-display text-2xl font-semibold text-emerald-950 mt-0.5">
+                      Week {plan.currentWeek} of {plan.totalWeeks}
+                    </h3>
+                  </div>
+                  <span className="text-sm font-semibold text-emerald-950/55">{plan.pct}% complete</span>
+                </div>
+                <div className="h-2 rounded-full bg-emerald-900/10 mt-4 overflow-hidden">
+                  <div className="h-full rounded-full bg-gradient-to-r from-emerald-600 to-emerald-400" style={{ width: `${plan.pct}%` }} />
+                </div>
+              </div>
+
+              {plan.templates.map(({ label, exercises, done }) => (
+                <div key={label} className="bg-white border border-emerald-900/10 rounded-2xl p-5">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${done ? 'bg-emerald-500' : 'border border-emerald-900/15'}`}>
+                      {done && <Check size={14} className="text-emerald-950" strokeWidth={3} />}
+                    </div>
+                    <h3 className="font-display text-lg font-semibold text-emerald-950">{label}</h3>
+                    {done && <span className="ml-auto text-xs font-semibold text-emerald-700">Completed</span>}
+                  </div>
+                  {exercises.length > 0 && (
+                    <div className="grid sm:grid-cols-2 gap-2 pl-9">
+                      {exercises.slice(0, 8).map((e, i) => (
+                        <p key={i} className="text-sm text-emerald-950/70 flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 flex-shrink-0" />{e}
+                        </p>
+                      ))}
+                      {exercises.length > 8 && (
+                        <p className="text-sm text-emerald-950/45 pl-3.5">+{exercises.length - 8} more</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))}
         </div>
       )}
 
