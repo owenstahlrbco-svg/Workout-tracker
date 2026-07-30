@@ -7,11 +7,11 @@
    No auth, no real data. Every "Get full access" button → Skool.
    ===================================================================== */
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
   LayoutDashboard, CalendarDays, FileText, GraduationCap, Dumbbell, TrendingUp,
   Flame, Check, Mail, Phone, Star, Lock, ArrowRight, Sparkles, Trophy,
-  MessageCircle, ChevronRight, Send, Plus, Languages,
+  MessageCircle, ChevronRight, Send, Plus, Languages, Menu, X,
 } from 'lucide-react'
 import { quoteForToday } from '@/lib/quotes'
 
@@ -37,77 +37,142 @@ const NAV_GROUPS: { title: string; items: { key: View; label: string; icon: Reac
     { key: 'message', label: 'Message Owen', icon: MessageCircle },
   ] },
 ]
-const ALL_ITEMS = NAV_GROUPS.flatMap(g => g.items)
+// Matches the exit animation duration in globals.css (--dur-fast).
+const EXIT_MS = 150
 
 export default function DemoDashboard() {
   const [view, setView] = useState<View>('home')
+  // Mirrors the real Navbar: `open` keeps the drawer mounted, `closing`
+  // plays the slide-out before unmount.
+  const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
+
+  const closeDrawer = useCallback(() => {
+    setClosing(true)
+    setTimeout(() => { setOpen(false); setClosing(false) }, EXIT_MS)
+  }, [])
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeDrawer() }
+    window.addEventListener('keydown', onKey)
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = previous
+    }
+  }, [open, closeDrawer])
+
+  function pick(next: View) {
+    setView(next)
+    if (open) closeDrawer()
+  }
 
   const navBtnCls = (active: boolean) =>
-    `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium lift w-full text-left ${
+    `group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium lift w-full text-left ${
       active ? 'bg-white text-emerald-950 shadow-sm' : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
     }`
+
+  // Shared by the desktop sidebar and the mobile drawer so the two can't drift.
+  const navBody = (animated: boolean) => (
+    <>
+      <div className="px-6 pt-7 pb-6 border-b border-white/10">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-emerald-400">Pitch HQ</p>
+        <p className="font-display text-2xl font-semibold text-white mt-0.5">Dashboard</p>
+        <span className="text-[10px] font-semibold uppercase tracking-wider bg-emerald-400/15 text-emerald-300 px-2.5 py-1 rounded-full mt-3 inline-flex items-center gap-1.5">
+          <Sparkles size={11} /> Demo preview
+        </span>
+      </div>
+
+      <nav className={`flex-1 px-4 py-5 space-y-6 overflow-y-auto ${animated ? 'stagger' : ''}`}>
+        {NAV_GROUPS.map(group => (
+          <div key={group.title}>
+            <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-100/40">{group.title}</p>
+            <div className="space-y-1">
+              {group.items.map(({ key, label, icon: Icon }) => (
+                <button key={key} onClick={() => pick(key)} className={navBtnCls(view === key)}>
+                  {view !== key && (
+                    <span
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-0 opacity-0 rounded-r-full bg-emerald-400 transition-all duration-300 ease-out group-hover:h-4 group-hover:opacity-100"
+                      aria-hidden
+                    />
+                  )}
+                  <Icon size={17} /> {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      <div className="p-4 border-t border-white/10 space-y-3">
+        <p className="text-emerald-100/60 text-xs leading-relaxed px-1">
+          This is a live preview. Unlock your own dashboard, plans, and the recruiting database inside The Pitch.
+        </p>
+        <a href={SKOOL_URL} target="_blank" rel="noopener noreferrer"
+           className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 text-emerald-950 font-semibold px-4 py-3 text-sm press hover:bg-emerald-300">
+          Get full access <ArrowRight size={15} />
+        </a>
+      </div>
+    </>
+  )
 
   return (
     <div className="md:flex md:h-screen bg-[#f5f8f5]">
       {/* ===== Desktop sidebar (mirrors the real dashboard chrome) ===== */}
       <aside className="hidden md:flex w-64 bg-emerald-950 text-white flex-col h-screen sticky top-0 flex-shrink-0">
-        <div className="px-6 pt-7 pb-6 border-b border-white/10">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-emerald-400">Pitch HQ</p>
-          <p className="font-display text-2xl font-semibold text-white mt-0.5">Dashboard</p>
-          <span className="text-[10px] font-semibold uppercase tracking-wider bg-emerald-400/15 text-emerald-300 px-2.5 py-1 rounded-full mt-3 inline-flex items-center gap-1.5">
-            <Sparkles size={11} /> Demo preview
-          </span>
-        </div>
-
-        <nav className="flex-1 px-4 py-5 space-y-6 overflow-y-auto">
-          {NAV_GROUPS.map(group => (
-            <div key={group.title}>
-              <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-100/40">{group.title}</p>
-              <div className="space-y-1">
-                {group.items.map(({ key, label, icon: Icon }) => (
-                  <button key={key} onClick={() => setView(key)} className={navBtnCls(view === key)}>
-                    <Icon size={17} /> {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </nav>
-
-        <div className="p-4 border-t border-white/10 space-y-3">
-          <p className="text-emerald-100/60 text-xs leading-relaxed px-1">
-            This is a live preview. Unlock your own dashboard, plans, and the recruiting database inside The Pitch.
-          </p>
-          <a href={SKOOL_URL} target="_blank" rel="noopener noreferrer"
-             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 text-emerald-950 font-semibold px-4 py-3 text-sm press hover:bg-emerald-300 transition-colors">
-            Get full access <ArrowRight size={15} />
-          </a>
-        </div>
+        {navBody(false)}
       </aside>
 
-      {/* ===== Mobile top bar ===== */}
+      {/* ===== Mobile top bar — hamburger opens the drawer, as in the real app ===== */}
       <div className="md:hidden sticky top-0 z-30 bg-emerald-950 text-white">
         <div className="flex items-center justify-between h-14 px-4">
-          <div className="flex items-baseline gap-2">
-            <span className="text-[9px] font-semibold uppercase tracking-[0.28em] text-emerald-400">Pitch HQ</span>
-            <span className="font-display text-lg font-semibold">Dashboard</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={open}
+              className="p-2 -ml-2 rounded-lg hover:bg-white/10 press"
+            >
+              <Menu size={22} />
+            </button>
+            <div className="flex items-baseline gap-2">
+              <span className="text-[9px] font-semibold uppercase tracking-[0.28em] text-emerald-400">Pitch HQ</span>
+              <span className="font-display text-lg font-semibold">Dashboard</span>
+            </div>
           </div>
           <a href={SKOOL_URL} target="_blank" rel="noopener noreferrer"
-             className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-400 text-emerald-950 font-semibold px-3 py-1.5 text-xs">
+             className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-400 text-emerald-950 font-semibold px-3 py-1.5 text-xs press">
             Get full access
           </a>
         </div>
-        <div className="flex gap-1.5 px-3 pb-3 overflow-x-auto">
-          {ALL_ITEMS.map(({ key, label, icon: Icon }) => (
-            <button key={key} onClick={() => setView(key)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap ${
-                view === key ? 'bg-white text-emerald-950' : 'bg-white/10 text-emerald-100/70'
-              }`}>
-              <Icon size={13} /> {label}
-            </button>
-          ))}
-        </div>
       </div>
+
+      {/* ===== Mobile drawer + backdrop ===== */}
+      {open && (
+        <div className="md:hidden fixed inset-0 z-50 flex">
+          <div
+            className={`absolute inset-0 bg-emerald-950/50 backdrop-blur-[2px] ${closing ? 'animate-fade-out' : 'animate-fade-in'}`}
+            onClick={closeDrawer}
+            aria-hidden
+          />
+          <aside
+            className={`relative w-72 max-w-[82%] bg-emerald-950 text-white flex flex-col h-full shadow-2xl will-change-transform ${
+              closing ? 'animate-slide-out-left' : 'animate-slide-in-left'
+            }`}
+          >
+            <button
+              onClick={closeDrawer}
+              aria-label="Close menu"
+              className="absolute top-4 right-4 z-10 p-2 rounded-lg text-emerald-100/70 hover:text-white hover:bg-white/10 press hover:rotate-90"
+            >
+              <X size={20} />
+            </button>
+            {navBody(!closing)}
+          </aside>
+        </div>
+      )}
 
       {/* ===== Main ===== */}
       <main className="flex-1 overflow-y-auto pb-16">
