@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 import {
   Dumbbell, LayoutDashboard, TrendingUp, CalendarDays, FileText,
   Users, LogOut, MessageCircle, Inbox, Library, Menu, X,
-  GraduationCap, KeyRound, Target,
+  GraduationCap, KeyRound, Target, Tent,
 } from 'lucide-react'
 
 interface NavbarProps {
@@ -75,6 +75,7 @@ export default function Navbar({ role, name, pathwayAccess = false }: NavbarProp
           title: 'Recruiting',
           links: [
             { href: '/dashboard/coaches', label: 'Coach Directory', icon: GraduationCap },
+            { href: '/dashboard/camps', label: 'Camp Finder', icon: Tent },
           ],
         }]
       : []),
@@ -100,6 +101,7 @@ export default function Navbar({ role, name, pathwayAccess = false }: NavbarProp
       title: 'Recruiting',
       links: [
         { href: '/dashboard/coaches', label: 'Coach Directory', icon: GraduationCap },
+        { href: '/dashboard/camps', label: 'Camp Finder', icon: Tent },
         { href: '/coach/targets', label: 'Player Targets', icon: Target },
       ],
     },

@@ -1,11 +1,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { GraduationCap, Lock } from 'lucide-react'
-import CoachDirectory from '@/components/CoachDirectory'
+import { Tent, Lock } from 'lucide-react'
+import CampFinder from '@/components/CampFinder'
 
-export const metadata = { title: 'Coach Directory · Pitch HQ' }
+export const metadata = { title: 'Camp Finder · Pitch HQ' }
 
-export default async function CoachDirectoryPage() {
+export default async function CampFinderPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login')
@@ -25,10 +25,10 @@ export default async function CoachDirectoryPage() {
           <div className="w-14 h-14 rounded-2xl bg-emerald-900/5 flex items-center justify-center mx-auto mb-5">
             <Lock size={24} className="text-emerald-800" />
           </div>
-          <h1 className="font-display text-2xl font-semibold text-emerald-950">Coach Directory</h1>
+          <h1 className="font-display text-2xl font-semibold text-emerald-950">Camp Finder</h1>
           <p className="text-emerald-950/55 mt-2">
-            The recruiting database is part of the <span className="font-semibold text-emerald-950">top tier</span>.
-            Message Owen to upgrade and unlock 41,000+ college coach contacts across every division.
+            College camps are part of the <span className="font-semibold text-emerald-950">top tier</span>.
+            Message Owen to upgrade and find camps near you.
           </p>
         </div>
       </div>
@@ -40,14 +40,16 @@ export default async function CoachDirectoryPage() {
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Pathway · Recruiting</p>
         <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1 flex items-center gap-2.5">
-          <GraduationCap size={30} className="text-emerald-700" /> Coach Directory
+          <Tent size={30} className="text-emerald-700" /> Camp Finder
         </h1>
         <p className="text-emerald-950/55 mt-2">
-          College coaches and pro clubs in one place. Switch between <span className="font-semibold text-emerald-950">College</span> and
-          {' '}<span className="font-semibold text-emerald-950">Pro</span>, filter it down, and click to email or call the contact directly.
+          College camps and prospect days, with dates, prices and the school running them.
+          Filter by <span className="font-semibold text-emerald-950">state</span> and{' '}
+          <span className="font-semibold text-emerald-950">sport</span> to find one near you, then open the
+          camp page to register.
         </p>
       </div>
-      <CoachDirectory />
+      <CampFinder />
     </div>
   )
 }
