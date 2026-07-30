@@ -16,7 +16,7 @@ interface Props {
   loggedNotInLibrary: string[]
 }
 
-const inputClass = "bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+const inputClass = "bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-shadow duration-200 focus:shadow-md"
 
 export default function ExerciseLibraryManager({ exercises: initial, loggedNotInLibrary }: Props) {
   const [exercises, setExercises] = useState(initial)
@@ -86,12 +86,12 @@ export default function ExerciseLibraryManager({ exercises: initial, loggedNotIn
   return (
     <div className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">{error}</div>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm animate-rise-in">{error}</div>
       )}
 
       {/* Logged by clients but missing from the library */}
       {missing.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5">
+        <div className="bg-amber-50 border border-amber-200 rounded-3xl p-5 animate-rise-in">
           <div className="flex items-center gap-2 mb-1">
             <AlertCircle size={16} className="text-amber-600" />
             <h2 className="font-display text-lg font-semibold text-emerald-950">
@@ -106,7 +106,7 @@ export default function ExerciseLibraryManager({ exercises: initial, loggedNotIn
               <button
                 key={name}
                 onClick={() => quickAdd(name)}
-                className="flex items-center gap-1.5 bg-white border border-amber-300 hover:border-emerald-700/50 text-emerald-950 text-sm rounded-full px-3.5 py-1.5 transition-colors"
+                className="flex items-center gap-1.5 bg-white border border-amber-300 hover:border-emerald-700/50 text-emerald-950 text-sm rounded-full px-3.5 py-1.5 press"
               >
                 <Plus size={13} className="text-emerald-700" /> {name}
               </button>
@@ -141,13 +141,13 @@ export default function ExerciseLibraryManager({ exercises: initial, loggedNotIn
               value={customCategory}
               onChange={e => setCustomCategory(e.target.value)}
               placeholder="New category name"
-              className={`${inputClass} min-w-[180px]`}
+              className={`${inputClass} min-w-[180px] animate-rise-in`}
             />
           )}
           <button
             onClick={addExercise}
             disabled={saving}
-            className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold rounded-xl px-5 py-2.5 transition-colors"
+            className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-50 hover:shadow-lg hover:shadow-emerald-900/20 text-white font-semibold rounded-xl px-5 py-2.5 press"
           >
             <Plus size={16} /> {saving ? 'Adding...' : 'Add'}
           </button>
@@ -168,18 +168,18 @@ export default function ExerciseLibraryManager({ exercises: initial, loggedNotIn
 
       {/* Grouped list */}
       {grouped.map(({ category, items }) => (
-        <div key={category} className="bg-white border border-emerald-900/10 rounded-3xl overflow-hidden">
+        <div key={category} className="bg-white border border-emerald-900/10 rounded-3xl overflow-hidden animate-rise-in">
           <div className="px-5 py-3 border-b border-emerald-900/10 bg-emerald-50/60 flex items-center justify-between">
             <h3 className="font-semibold text-emerald-950 text-sm">{category}</h3>
             <span className="text-emerald-950/45 text-xs font-medium">{items.length}</span>
           </div>
           <div className="divide-y divide-emerald-900/10">
             {items.map(ex => (
-              <div key={ex.id} className="flex items-center justify-between px-5 py-2.5 group">
+              <div key={ex.id} className="flex items-center justify-between px-5 py-2.5 group transition-colors duration-200 hover:bg-emerald-50/60">
                 <span className="text-emerald-950/80 text-sm">{ex.name}</span>
                 <button
                   onClick={() => deleteExercise(ex)}
-                  className="text-emerald-950/0 group-hover:text-emerald-950/30 hover:!text-red-500 transition-colors"
+                  className="text-emerald-950/0 group-hover:text-emerald-950/30 hover:!text-red-500 press"
                 >
                   <Trash2 size={14} />
                 </button>
@@ -190,7 +190,7 @@ export default function ExerciseLibraryManager({ exercises: initial, loggedNotIn
       ))}
 
       {filtered.length === 0 && (
-        <div className="bg-white border border-emerald-900/10 rounded-3xl p-10 text-center text-emerald-950/50 text-sm">
+        <div className="bg-white border border-emerald-900/10 rounded-3xl p-10 text-center text-emerald-950/50 text-sm animate-rise-in">
           No exercises match &ldquo;{search}&rdquo; — add it above.
         </div>
       )}

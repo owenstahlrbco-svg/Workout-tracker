@@ -8,7 +8,7 @@ export default async function MessagesPage() {
   if (!user) redirect('/auth/login')
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 stagger">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Direct Line</p>
         <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1">Message Owen</h1>

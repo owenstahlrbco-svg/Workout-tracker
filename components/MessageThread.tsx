@@ -76,7 +76,7 @@ export default function MessageThread({ clientId, currentUserId }: Props) {
             const mine = m.sender_id === currentUserId
             return (
               <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
+                <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 animate-rise-in ${
                   mine
                     ? 'bg-emerald-800 text-white rounded-br-md'
                     : 'bg-emerald-50 text-emerald-950 rounded-bl-md'
@@ -99,14 +99,14 @@ export default function MessageThread({ clientId, currentUserId }: Props) {
           value={draft}
           onChange={e => setDraft(e.target.value)}
           placeholder="Write a message..."
-          className="flex-1 bg-[#f5f8f5] border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm"
+          className="flex-1 bg-[#f5f8f5] border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600 text-sm transition-shadow duration-200 focus:shadow-md"
         />
         <button
           type="submit"
           disabled={sending || !draft.trim()}
-          className="bg-emerald-800 hover:bg-emerald-700 disabled:opacity-40 text-white rounded-xl px-5 transition-colors flex items-center gap-2 text-sm font-semibold"
+          className="bg-emerald-800 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-900/20 disabled:opacity-40 text-white rounded-xl px-5 press group flex items-center gap-2 text-sm font-semibold"
         >
-          <Send size={15} /> Send
+          <Send size={15} className="nudge-x" /> Send
         </button>
       </form>
     </div>

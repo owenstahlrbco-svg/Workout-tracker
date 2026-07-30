@@ -46,10 +46,10 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
   const workoutDates = new Set(workouts?.map(w => w.date) ?? [])
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 stagger">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-4">
-          <Link href="/coach" className="text-emerald-950/50 hover:text-emerald-950 transition-colors mt-1.5">
+          <Link href="/coach" className="text-emerald-950/50 hover:text-emerald-950 press inline-block mt-1.5">
             <ArrowLeft size={20} />
           </Link>
           <div>
@@ -62,7 +62,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         </div>
         <Link
           href={`/coach/messages/${client.id}`}
-          className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl px-5 py-2.5 transition-colors"
+          className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-900/20 text-white font-semibold text-sm rounded-xl px-5 py-2.5 press"
         >
           <MessageCircle size={16} /> Message
         </Link>
@@ -70,15 +70,15 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white border border-emerald-900/10 rounded-2xl p-5">
+        <div className="bg-white border border-emerald-900/10 rounded-2xl p-5 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Total Workouts</p>
           <p className="font-display text-3xl font-semibold text-emerald-950 mt-1">{workouts?.length ?? 0}</p>
         </div>
-        <div className="bg-white border border-emerald-900/10 rounded-2xl p-5">
+        <div className="bg-white border border-emerald-900/10 rounded-2xl p-5 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Total Exercises</p>
           <p className="font-display text-3xl font-semibold text-emerald-950 mt-1">{totalSets}</p>
         </div>
-        <div className="bg-white border border-emerald-900/10 rounded-2xl p-5">
+        <div className="bg-white border border-emerald-900/10 rounded-2xl p-5 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Total Volume</p>
           <p className="font-display text-3xl font-semibold text-emerald-950 mt-1">{totalVolume.toLocaleString()}</p>
           <p className="text-emerald-950/40 text-xs">lbs</p>
@@ -141,7 +141,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
         {workouts && workouts.length > 0 ? (
           <div className="space-y-3">
             {workouts.map(workout => (
-              <div key={workout.id} className="bg-white border border-emerald-900/10 rounded-2xl p-5">
+              <div key={workout.id} className="bg-white border border-emerald-900/10 hover:border-emerald-700/25 hover:shadow-[0_6px_22px_rgba(6,78,59,0.07)] rounded-2xl p-5 lift">
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-emerald-950 font-semibold">
                     {format(parseDate(workout.date), 'EEEE, MMMM d, yyyy')}

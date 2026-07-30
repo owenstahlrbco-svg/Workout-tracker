@@ -40,7 +40,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="bg-white border border-emerald-900/10 rounded-3xl p-8 space-y-5 shadow-[0_8px_30px_rgba(6,78,59,0.08)]">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm animate-rise-in">
               {error}
             </div>
           )}
@@ -52,7 +52,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              className="w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-shadow duration-200 focus:shadow-md"
               placeholder="you@example.com"
             />
           </div>
@@ -64,7 +64,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+              className="w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-shadow duration-200 focus:shadow-md"
               placeholder="••••••••"
             />
           </div>
@@ -72,14 +72,14 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-800 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition-colors"
+            className="w-full bg-emerald-800 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-900/20 disabled:opacity-50 text-white font-semibold rounded-xl py-3 press"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
           <p className="text-center text-emerald-950/55 text-sm">
             Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="text-emerald-700 font-medium hover:text-emerald-600">
+            <Link href="/auth/signup" className="text-emerald-700 font-medium hover:text-emerald-600 press inline-block">
               Sign up
             </Link>
           </p>

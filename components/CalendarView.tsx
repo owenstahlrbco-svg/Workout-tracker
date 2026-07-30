@@ -64,19 +64,21 @@ export default function CalendarView({ workouts, programDays: allProgramDays }: 
           <div className="flex gap-2">
             <button
               onClick={() => setCurrent(subMonths(current, 1))}
-              className="p-2 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 transition-colors"
+              aria-label="Previous month"
+              className="p-2 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 press"
             >
               <ChevronLeft size={16} />
             </button>
             <button
               onClick={() => setCurrent(new Date())}
-              className="px-3 py-1.5 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 text-sm transition-colors"
+              className="px-3 py-1.5 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 text-sm press"
             >
               Today
             </button>
             <button
               onClick={() => setCurrent(addMonths(current, 1))}
-              className="p-2 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 transition-colors"
+              aria-label="Next month"
+              className="p-2 rounded-xl bg-emerald-900/5 hover:bg-emerald-900/10 text-emerald-950/60 hover:text-emerald-950 press"
             >
               <ChevronRight size={16} />
             </button>
@@ -91,7 +93,8 @@ export default function CalendarView({ workouts, programDays: allProgramDays }: 
         </div>
 
         {/* Calendar grid */}
-        <div className="grid grid-cols-7 gap-1">
+        {/* Re-keyed on the month so the grid fades through on navigation */}
+        <div key={format(current, 'yyyy-MM')} className="grid grid-cols-7 gap-1 animate-fade-in">
           {/* Empty cells for start offset */}
           {Array.from({ length: startDow }).map((_, i) => (
             <div key={`empty-${i}`} />
@@ -107,9 +110,9 @@ export default function CalendarView({ workouts, programDays: allProgramDays }: 
               <button
                 key={day.toISOString()}
                 onClick={() => setSelected(isSelected ? null : day)}
-                className={`relative aspect-square flex flex-col items-center justify-center rounded-xl text-sm transition-colors p-1 ${
+                className={`relative aspect-square flex flex-col items-center justify-center rounded-xl text-sm p-1 press ${
                   isSelected
-                    ? 'bg-emerald-800 text-white'
+                    ? 'bg-emerald-800 text-white shadow-md shadow-emerald-900/25'
                     : todayDay
                     ? 'bg-emerald-50 text-emerald-950 ring-2 ring-emerald-600'
                     : 'hover:bg-emerald-900/5 text-emerald-950/75'
@@ -117,8 +120,8 @@ export default function CalendarView({ workouts, programDays: allProgramDays }: 
               >
                 <span className="font-medium">{format(day, 'd')}</span>
                 <div className="flex gap-0.5 mt-0.5">
-                  {hasWorkout && <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-emerald-600'}`} />}
-                  {hasProgram && <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />}
+                  {hasWorkout && <span className={`w-1.5 h-1.5 rounded-full animate-pop-in ${isSelected ? 'bg-white' : 'bg-emerald-600'}`} />}
+                  {hasProgram && <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pop-in" />}
                 </div>
               </button>
             )
@@ -138,7 +141,7 @@ export default function CalendarView({ workouts, programDays: allProgramDays }: 
 
       {/* Selected day detail */}
       {selected && (
-        <div className="bg-white border border-emerald-900/10 rounded-3xl p-6 space-y-4">
+        <div key={format(selected, 'yyyy-MM-dd')} className="bg-white border border-emerald-900/10 rounded-3xl p-6 space-y-4 animate-rise-in">
           <h3 className="font-display text-lg font-semibold text-emerald-950">{format(selected, 'EEEE, MMMM d')}</h3>
 
           {selectedWorkout ? (
@@ -173,7 +176,7 @@ export default function CalendarView({ workouts, programDays: allProgramDays }: 
                 <button
                   onClick={() => removeProgramDay(selectedProgram.id)}
                   disabled={removing}
-                  className="flex items-center gap-1.5 text-xs font-medium text-emerald-950/40 hover:text-red-500 disabled:opacity-50 transition-colors"
+                  className="flex items-center gap-1.5 text-xs font-medium text-emerald-950/40 hover:text-red-500 disabled:opacity-50 press"
                 >
                   <Trash2 size={13} />
                   {removing ? 'Removing...' : 'Remove from calendar'}

@@ -4,11 +4,13 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Eye, EyeOff } from 'lucide-react'
 import { CLIENT_TYPES, type ClientType } from '@/lib/clientTypes'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [fullName, setFullName] = useState('')
   const [role, setRole] = useState<'client' | 'coach'>('client')
   const [clientType, setClientType] = useState<ClientType>('online')
@@ -46,7 +48,7 @@ export default function SignupPage() {
     }
   }
 
-  const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+  const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-shadow duration-200 focus:shadow-md"
 
   return (
     <div className="min-h-screen bg-[#f5f8f5] flex items-center justify-center px-4 py-10">
@@ -59,7 +61,7 @@ export default function SignupPage() {
 
         <form onSubmit={handleSignup} className="bg-white border border-emerald-900/10 rounded-3xl p-8 space-y-5 shadow-[0_8px_30px_rgba(6,78,59,0.08)]">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm">
+            <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-red-700 text-sm animate-rise-in">
               {error}
             </div>
           )}
@@ -78,8 +80,19 @@ export default function SignupPage() {
 
           <div>
             <label className="block text-sm font-medium text-emerald-950 mb-1.5">Password</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
-              className={inputClass} placeholder="••••••••" />
+            <div className="relative">
+              <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6}
+                className={`${inputClass} pr-11`} placeholder={showPassword ? 'Your password' : '••••••••'} />
+              <button
+                type="button"
+                onClick={() => setShowPassword(v => !v)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-950/40 hover:text-emerald-700 transition-colors duration-200 hover:scale-110 active:scale-95"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
 
           <div>
@@ -90,7 +103,7 @@ export default function SignupPage() {
                   key={r}
                   type="button"
                   onClick={() => setRole(r)}
-                  className={`py-2.5 rounded-xl font-medium text-sm capitalize transition-colors ${
+                  className={`py-2.5 rounded-xl font-medium text-sm capitalize press ${
                     role === r
                       ? 'bg-emerald-800 text-white'
                       : 'bg-emerald-900/5 text-emerald-950/60 hover:bg-emerald-900/10'
@@ -111,7 +124,7 @@ export default function SignupPage() {
                     key={t.value}
                     type="button"
                     onClick={() => setClientType(t.value)}
-                    className={`w-full text-left px-4 py-3 rounded-xl border transition-colors ${
+                    className={`w-full text-left px-4 py-3 rounded-xl border press ${
                       clientType === t.value
                         ? 'border-emerald-700 bg-emerald-50 ring-1 ring-emerald-700'
                         : 'border-emerald-900/15 hover:border-emerald-700/40'
@@ -136,14 +149,14 @@ export default function SignupPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-emerald-800 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition-colors"
+            className="w-full bg-emerald-800 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-900/20 disabled:opacity-50 text-white font-semibold rounded-xl py-3 press"
           >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
 
           <p className="text-center text-emerald-950/55 text-sm">
             Already have an account?{' '}
-            <Link href="/auth/login" className="text-emerald-700 font-medium hover:text-emerald-600">
+            <Link href="/auth/login" className="text-emerald-700 font-medium hover:text-emerald-600 press inline-block">
               Sign in
             </Link>
           </p>

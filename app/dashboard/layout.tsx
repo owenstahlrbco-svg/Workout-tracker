@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import PageTransition from '@/components/PageTransition'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -16,12 +17,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   const role = profile?.role ?? user.user_metadata?.role ?? 'client'
   const name = profile?.full_name ?? user.user_metadata?.full_name ?? user.email ?? ''
+  const pathwayAccess = profile?.pathway_access === true || role === 'coach'
 
   return (
     <div className="md:flex md:h-screen bg-[#f5f8f5]">
-      <Navbar role={role} name={name} />
+      <Navbar role={role} name={name} pathwayAccess={pathwayAccess} />
       <main className="flex-1 overflow-y-auto pt-20 px-4 pb-10 md:p-8">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
     </div>
   )

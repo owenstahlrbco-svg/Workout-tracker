@@ -46,7 +46,7 @@ export default async function DashboardPage() {
   const quote = quoteForToday()
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8 stagger">
       {/* Quote of the day */}
       <div className="border-l-2 border-emerald-600/70 pl-5 py-1">
         <p className="font-display text-xl italic text-emerald-950/85 leading-relaxed">
@@ -66,7 +66,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Today's session */}
-      <div className="bg-emerald-950 text-white rounded-3xl p-7 shadow-[0_10px_40px_rgba(6,78,59,0.25)]">
+      <div className="bg-emerald-950 text-white rounded-3xl p-7 shadow-[0_10px_40px_rgba(6,78,59,0.25)] hover:shadow-[0_16px_50px_rgba(6,78,59,0.32)] transition-shadow duration-300">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-emerald-400">Today&apos;s Session</p>
@@ -82,16 +82,16 @@ export default async function DashboardPage() {
             )}
           </div>
           {loggedToday && (
-            <span className="flex items-center gap-1.5 text-xs font-semibold bg-emerald-400/15 text-emerald-300 px-3 py-1.5 rounded-full flex-shrink-0">
+            <span className="flex items-center gap-1.5 text-xs font-semibold bg-emerald-400/15 text-emerald-300 px-3 py-1.5 rounded-full flex-shrink-0 animate-pop-in">
               <Flame size={13} /> Completed
             </span>
           )}
         </div>
         <div className="flex flex-wrap gap-3 mt-6">
-          <Link href="/dashboard/log" className="bg-white text-emerald-950 hover:bg-emerald-50 font-semibold text-sm rounded-xl px-5 py-2.5 transition-colors">
+          <Link href="/dashboard/log" className="bg-white text-emerald-950 hover:bg-emerald-50 hover:shadow-lg font-semibold text-sm rounded-xl px-5 py-2.5 press">
             {loggedToday ? 'Log Another Workout' : 'Log This Workout'}
           </Link>
-          <Link href="/dashboard/calendar" className="border border-white/25 hover:bg-white/10 text-white font-medium text-sm rounded-xl px-5 py-2.5 transition-colors">
+          <Link href="/dashboard/calendar" className="border border-white/25 hover:bg-white/10 hover:border-white/50 text-white font-medium text-sm rounded-xl px-5 py-2.5 press">
             View Calendar
           </Link>
         </div>
@@ -99,17 +99,17 @@ export default async function DashboardPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl p-6 border border-emerald-900/10">
+        <div className="bg-white rounded-2xl p-6 border border-emerald-900/10 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Total Workouts</p>
           <p className="font-display text-4xl font-semibold text-emerald-950 mt-1">{totalWorkouts ?? 0}</p>
           <p className="text-emerald-950/40 text-xs mt-1">all time</p>
         </div>
-        <div className="bg-white rounded-2xl p-6 border border-emerald-900/10">
+        <div className="bg-white rounded-2xl p-6 border border-emerald-900/10 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Total Volume</p>
           <p className="font-display text-4xl font-semibold text-emerald-950 mt-1">{totalVolume.toLocaleString()}</p>
           <p className="text-emerald-950/40 text-xs mt-1">lbs lifted (all time)</p>
         </div>
-        <div className="bg-white rounded-2xl p-6 border border-emerald-900/10">
+        <div className="bg-white rounded-2xl p-6 border border-emerald-900/10 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Last Workout</p>
           <p className="font-display text-2xl font-semibold text-emerald-950 mt-1">
             {recentWorkouts?.[0] ? format(parseDate(recentWorkouts[0].date), 'MMM d') : '—'}
@@ -134,16 +134,16 @@ export default async function DashboardPage() {
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-4 bg-white border border-emerald-900/10 hover:border-emerald-700/40 hover:shadow-[0_4px_20px_rgba(6,78,59,0.08)] rounded-2xl p-4 transition-all group"
+              className="flex items-center gap-4 bg-white border border-emerald-900/10 hover:border-emerald-700/40 hover:shadow-[0_8px_28px_rgba(6,78,59,0.10)] rounded-2xl p-4 lift group"
             >
-              <div className="text-emerald-700 bg-emerald-50 rounded-xl p-2.5">
+              <div className="text-emerald-700 bg-emerald-50 rounded-xl p-2.5 transition-all duration-300 ease-out group-hover:bg-emerald-100 group-hover:scale-105">
                 <Icon size={20} />
               </div>
               <div className="flex-1">
                 <p className="text-emerald-950 font-semibold text-sm">{label}</p>
                 <p className="text-emerald-950/50 text-xs mt-0.5">{desc}</p>
               </div>
-              <ChevronRight size={16} className="text-emerald-950/30 group-hover:text-emerald-700 transition-colors" />
+              <ChevronRight size={16} className="text-emerald-950/30 group-hover:text-emerald-700 nudge-x" />
             </Link>
           ))}
         </div>
@@ -155,7 +155,7 @@ export default async function DashboardPage() {
         {recentWorkouts && recentWorkouts.length > 0 ? (
           <div className="space-y-3">
             {recentWorkouts.map((workout) => (
-              <div key={workout.id} className="bg-white border border-emerald-900/10 rounded-2xl p-4">
+              <div key={workout.id} className="bg-white border border-emerald-900/10 hover:border-emerald-700/25 hover:shadow-[0_6px_22px_rgba(6,78,59,0.07)] rounded-2xl p-4 lift">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-emerald-950 font-semibold">
@@ -193,7 +193,7 @@ export default async function DashboardPage() {
           <div className="bg-white border border-emerald-900/10 rounded-2xl p-8 text-center">
             <Dumbbell size={32} className="text-emerald-900/25 mx-auto mb-3" />
             <p className="text-emerald-950/55">No workouts logged yet.</p>
-            <Link href="/dashboard/log" className="text-emerald-700 font-medium text-sm hover:text-emerald-600 mt-1 inline-block">
+            <Link href="/dashboard/log" className="text-emerald-700 font-medium text-sm hover:text-emerald-600 mt-1 inline-block press">
               Log your first workout →
             </Link>
           </div>

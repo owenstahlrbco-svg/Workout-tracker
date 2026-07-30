@@ -1,24 +1,52 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import {
   Dumbbell, LayoutDashboard, TrendingUp, CalendarDays, FileText,
   Users, LogOut, MessageCircle, Inbox, Library, Menu, X,
+  GraduationCap, KeyRound, Target,
 } from 'lucide-react'
 
 interface NavbarProps {
   role: 'client' | 'coach'
   name: string
+  pathwayAccess?: boolean
 }
 
-export default function Navbar({ role, name }: NavbarProps) {
+// Matches the exit animation duration in globals.css (--dur-fast).
+const EXIT_MS = 150
+
+export default function Navbar({ role, name, pathwayAccess = false }: NavbarProps) {
   const pathname = usePathname()
   const router = useRouter()
   const supabase = createClient()
+  // `open` keeps the drawer mounted; `closing` plays the slide-out before unmount.
   const [open, setOpen] = useState(false)
+  const [closing, setClosing] = useState(false)
+
+  const closeDrawer = useCallback(() => {
+    setClosing(true)
+    setTimeout(() => {
+      setOpen(false)
+      setClosing(false)
+    }, EXIT_MS)
+  }, [])
+
+  // Escape closes the drawer, and the page behind it shouldn't scroll.
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeDrawer() }
+    window.addEventListener('keydown', onKey)
+    const previous = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = previous
+    }
+  }, [open, closeDrawer])
 
   async function handleSignOut() {
     await supabase.auth.signOut()
@@ -42,6 +70,14 @@ export default function Navbar({ role, name }: NavbarProps) {
         { href: '/dashboard/progress', label: 'Progress', icon: TrendingUp },
       ],
     },
+    ...(pathwayAccess
+      ? [{
+          title: 'Recruiting',
+          links: [
+            { href: '/dashboard/coaches', label: 'Coach Directory', icon: GraduationCap },
+          ],
+        }]
+      : []),
     {
       title: 'Coach',
       links: [
@@ -55,21 +91,33 @@ export default function Navbar({ role, name }: NavbarProps) {
       title: 'Coaching',
       links: [
         { href: '/coach', label: 'Clients', icon: Users },
+        { href: '/coach/members', label: 'Members & Access', icon: KeyRound },
         { href: '/coach/messages', label: 'Messages', icon: Inbox },
         { href: '/coach/library', label: 'Exercise Library', icon: Library },
+      ],
+    },
+    {
+      title: 'Recruiting',
+      links: [
+        { href: '/dashboard/coaches', label: 'Coach Directory', icon: GraduationCap },
+        { href: '/coach/targets', label: 'Player Targets', icon: Target },
       ],
     },
     {
       title: 'Personal',
       links: [
         { href: '/dashboard', label: 'My Dashboard', icon: LayoutDashboard },
+        { href: '/dashboard/import', label: 'My Plans', icon: FileText },
+        { href: '/dashboard/progress', label: 'Progress', icon: TrendingUp },
       ],
     },
   ]
 
   const sections = role === 'coach' ? coachSections : clientSections
 
-  const navBody = (
+  // `animated` staggers the drawer's own contents in behind the slide; the
+  // desktop sidebar is always present, so it renders static.
+  const navBody = (animated: boolean) => (
     <>
       <div className="px-6 pt-7 pb-6 border-b border-white/10">
         <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-emerald-400">Pitch HQ</p>
@@ -82,7 +130,7 @@ export default function Navbar({ role, name }: NavbarProps) {
         )}
       </div>
 
-      <nav className="flex-1 px-4 py-5 space-y-6 overflow-y-auto">
+      <nav className={`flex-1 px-4 py-5 space-y-6 overflow-y-auto ${animated ? 'stagger' : ''}`}>
         {sections.map(section => (
           <div key={section.title}>
             <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-emerald-100/40">
@@ -95,14 +143,24 @@ export default function Navbar({ role, name }: NavbarProps) {
                   <Link
                     key={href}
                     href={href}
-                    onClick={() => setOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                    onClick={() => open && closeDrawer()}
+                    className={`group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium lift ${
                       active
                         ? 'bg-white text-emerald-950 shadow-sm'
                         : 'text-emerald-100/70 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    <Icon size={17} />
+                    {/* Hover marker grows out from the left edge (active rows already read as filled) */}
+                    {!active && (
+                      <span
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-0 opacity-0 rounded-r-full bg-emerald-400 transition-all duration-300 ease-out group-hover:h-4 group-hover:opacity-100"
+                        aria-hidden
+                      />
+                    )}
+                    <Icon
+                      size={17}
+                      className="transition-transform duration-200 ease-out group-hover:scale-110 group-active:scale-95"
+                    />
                     {label}
                   </Link>
                 )
@@ -115,9 +173,9 @@ export default function Navbar({ role, name }: NavbarProps) {
       <div className="p-4 border-t border-white/10">
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-emerald-100/60 hover:text-white hover:bg-white/10 transition-colors"
+          className="group flex items-center gap-3 px-3 py-2.5 w-full rounded-xl text-sm font-medium text-emerald-100/60 hover:text-white hover:bg-white/10 press"
         >
-          <LogOut size={17} />
+          <LogOut size={17} className="nudge-x" />
           Sign Out
         </button>
       </div>
@@ -135,7 +193,8 @@ export default function Navbar({ role, name }: NavbarProps) {
         <button
           onClick={() => setOpen(true)}
           aria-label="Open menu"
-          className="p-2 -mr-2 rounded-lg hover:bg-white/10 transition-colors"
+          aria-expanded={open}
+          className="p-2 -mr-2 rounded-lg hover:bg-white/10 press"
         >
           <Menu size={22} />
         </button>
@@ -145,26 +204,32 @@ export default function Navbar({ role, name }: NavbarProps) {
       {open && (
         <div className="md:hidden fixed inset-0 z-50 flex">
           <div
-            className="absolute inset-0 bg-emerald-950/50"
-            onClick={() => setOpen(false)}
+            className={`absolute inset-0 bg-emerald-950/50 backdrop-blur-[2px] ${
+              closing ? 'animate-fade-out' : 'animate-fade-in'
+            }`}
+            onClick={closeDrawer}
             aria-hidden
           />
-          <aside className="relative w-72 max-w-[82%] bg-emerald-950 text-white flex flex-col h-full shadow-2xl">
+          <aside
+            className={`relative w-72 max-w-[82%] bg-emerald-950 text-white flex flex-col h-full shadow-2xl will-change-transform ${
+              closing ? 'animate-slide-out-left' : 'animate-slide-in-left'
+            }`}
+          >
             <button
-              onClick={() => setOpen(false)}
+              onClick={closeDrawer}
               aria-label="Close menu"
-              className="absolute top-4 right-4 z-10 p-2 rounded-lg text-emerald-100/70 hover:text-white hover:bg-white/10 transition-colors"
+              className="absolute top-4 right-4 z-10 p-2 rounded-lg text-emerald-100/70 hover:text-white hover:bg-white/10 press hover:rotate-90"
             >
               <X size={20} />
             </button>
-            {navBody}
+            {navBody(!closing)}
           </aside>
         </div>
       )}
 
       {/* Desktop sidebar — md and up */}
       <aside className="hidden md:flex w-64 bg-emerald-950 text-white flex-col h-screen sticky top-0 flex-shrink-0">
-        {navBody}
+        {navBody(false)}
       </aside>
     </>
   )

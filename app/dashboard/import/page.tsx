@@ -26,7 +26,7 @@ interface PlanDayRow {
   content: string
 }
 
-const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-shadow duration-200 focus:shadow-md"
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
@@ -328,7 +328,7 @@ export default function ImportPage() {
               <button
                 onClick={parseIntoDays}
                 disabled={!rawText.trim()}
-                className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-40 text-white font-semibold rounded-xl px-5 py-2.5 transition-colors"
+                className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-900/20 disabled:opacity-40 text-white font-semibold rounded-xl px-5 py-2.5 press"
               >
                 <FileText size={16} /> Split into Days
               </button>
@@ -348,7 +348,7 @@ export default function ImportPage() {
                   setTimeout(() => setSuccess(false), 3000)
                 }}
                 disabled={saving || !rawText.trim()}
-                className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 disabled:opacity-40 text-emerald-950 font-medium rounded-xl px-5 py-2.5 transition-colors"
+                className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 hover:shadow-md disabled:opacity-40 text-emerald-950 font-medium rounded-xl px-5 py-2.5 transition-colors"
               >
                 <Save size={16} /> Save as-is
               </button>
@@ -364,7 +364,7 @@ export default function ImportPage() {
               <h2 className="font-display text-lg font-semibold text-emerald-950">Build Your Schedule</h2>
               <button
                 onClick={() => setStep('input')}
-                className="text-sm text-emerald-950/55 hover:text-emerald-950 transition-colors"
+                className="text-sm text-emerald-950/55 hover:text-emerald-950 press inline-block"
               >
                 ← Back
               </button>
@@ -379,7 +379,7 @@ export default function ImportPage() {
             <div className="grid grid-cols-2 gap-2">
               <button
                 onClick={() => setMode('weekly')}
-                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold press ${
                   mode === 'weekly' ? 'bg-emerald-800 text-white' : 'bg-emerald-900/5 text-emerald-950/60 hover:bg-emerald-900/10'
                 }`}
               >
@@ -387,7 +387,7 @@ export default function ImportPage() {
               </button>
               <button
                 onClick={() => setMode('exact')}
-                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+                className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold press ${
                   mode === 'exact' ? 'bg-emerald-800 text-white' : 'bg-emerald-900/5 text-emerald-950/60 hover:bg-emerald-900/10'
                 }`}
               >
@@ -441,7 +441,7 @@ export default function ImportPage() {
             <div key={i} className="bg-white border border-emerald-900/10 rounded-3xl p-5 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-emerald-950 font-semibold text-sm">{day.label || `Day ${i + 1}`}</span>
-                <button onClick={() => removeDay(i)} className="text-emerald-950/30 hover:text-red-500 transition-colors">
+                <button onClick={() => removeDay(i)} className="text-emerald-950/30 hover:text-red-500 press">
                   <Trash2 size={15} />
                 </button>
               </div>
@@ -454,7 +454,7 @@ export default function ImportPage() {
                       <button
                         key={wd}
                         onClick={() => toggleWeekday(i, wd)}
-                        className={`w-11 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                        className={`w-11 py-2 rounded-xl text-xs font-semibold press ${
                           day.weekdays.includes(wd)
                             ? 'bg-emerald-800 text-white'
                             : 'bg-emerald-900/5 text-emerald-950/60 hover:bg-emerald-900/10'
@@ -489,14 +489,14 @@ export default function ImportPage() {
           <div className="flex gap-3">
             <button
               onClick={() => setDays([...days, { date: format(new Date(), 'yyyy-MM-dd'), label: `Day ${days.length + 1}`, content: '', weekdays: [] }])}
-              className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 text-emerald-950 rounded-xl px-4 py-2.5 text-sm transition-colors"
+              className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 hover:shadow-md text-emerald-950 rounded-xl px-4 py-2.5 text-sm transition-colors"
             >
               <Plus size={15} /> Add Another Day
             </button>
             <button
               onClick={handleSave}
               disabled={saving || (mode === 'weekly' && !anyWeekdaySelected)}
-              className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-colors"
+              className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-900/20 disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-colors"
             >
               <Save size={16} />
               {saving
@@ -534,7 +534,7 @@ export default function ImportPage() {
               </div>
 
               {plan.templates.map(({ label, exercises, done }) => (
-                <div key={label} className="bg-white border border-emerald-900/10 rounded-2xl p-5">
+                <div key={label} className="bg-white border border-emerald-900/10 hover:border-emerald-700/25 hover:shadow-[0_6px_22px_rgba(6,78,59,0.07)] rounded-2xl p-5 lift">
                   <div className="flex items-center gap-3 mb-3">
                     <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${done ? 'bg-emerald-500' : 'border border-emerald-900/15'}`}>
                       {done && <Check size={14} className="text-emerald-950" strokeWidth={3} />}
@@ -579,7 +579,7 @@ export default function ImportPage() {
                 </div>
                 <button
                   onClick={() => deleteProgram(p.id, p.title)}
-                  className="flex items-center gap-1.5 text-xs font-medium text-emerald-950/40 hover:text-red-500 transition-colors"
+                  className="flex items-center gap-1.5 text-xs font-medium text-emerald-950/40 hover:text-red-500 press"
                 >
                   <Trash2 size={14} /> Delete plan
                 </button>

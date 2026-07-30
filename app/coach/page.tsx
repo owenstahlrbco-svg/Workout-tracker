@@ -70,7 +70,7 @@ export default async function CoachPage() {
   ]
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8 stagger">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Coach HQ</p>
         <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1">Your Clients</h1>
@@ -79,21 +79,21 @@ export default async function CoachPage() {
 
       {/* Business metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-emerald-950 text-white rounded-2xl p-5">
+        <div className="bg-emerald-950 text-white rounded-2xl p-5 hover:shadow-[0_10px_32px_rgba(6,78,59,0.30)] lift">
           <p className="text-emerald-100/60 text-sm">Total Clients</p>
           <p className="font-display text-4xl font-semibold mt-1">{clientList.length}</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-emerald-900/10">
+        <div className="bg-white rounded-2xl p-5 border border-emerald-900/10 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Active This Week</p>
           <p className="font-display text-4xl font-semibold text-emerald-950 mt-1">{activeThisWeek}</p>
           <p className="text-emerald-950/40 text-xs mt-1">logged ≥1 workout</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-emerald-900/10">
+        <div className="bg-white rounded-2xl p-5 border border-emerald-900/10 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Sessions This Week</p>
           <p className="font-display text-4xl font-semibold text-emerald-950 mt-1">{sessionsThisWeek}</p>
           <p className="text-emerald-950/40 text-xs mt-1">across all clients</p>
         </div>
-        <div className="bg-white rounded-2xl p-5 border border-emerald-900/10">
+        <div className="bg-white rounded-2xl p-5 border border-emerald-900/10 hover:border-emerald-700/30 hover:shadow-[0_6px_24px_rgba(6,78,59,0.08)] lift">
           <p className="text-emerald-950/55 text-sm">Plan Adherence</p>
           <p className="font-display text-4xl font-semibold text-emerald-950 mt-1">
             {adherence !== null ? `${adherence}%` : '—'}
@@ -126,7 +126,7 @@ export default async function CoachPage() {
                     <Link
                       key={client.id}
                       href={`/coach/client/${client.id}`}
-                      className="flex items-center gap-4 bg-white border border-emerald-900/10 hover:border-emerald-700/40 hover:shadow-[0_4px_20px_rgba(6,78,59,0.08)] rounded-2xl p-4 transition-all group"
+                      className="flex items-center gap-4 bg-white border border-emerald-900/10 hover:border-emerald-700/40 hover:shadow-[0_8px_28px_rgba(6,78,59,0.10)] rounded-2xl p-4 lift group"
                     >
                       <div className="relative flex-shrink-0">
                         <div className="w-11 h-11 rounded-full bg-emerald-800 flex items-center justify-center text-white font-semibold">
@@ -148,7 +148,7 @@ export default async function CoachPage() {
                           {all.length} total · {last ? `last ${format(parseDate(last.date), 'MMM d')}` : 'no workouts'}
                         </p>
                       </div>
-                      <ChevronRight size={16} className="text-emerald-950/30 group-hover:text-emerald-700 transition-colors flex-shrink-0" />
+                      <ChevronRight size={16} className="text-emerald-950/30 group-hover:text-emerald-700 nudge-x flex-shrink-0" />
                     </Link>
                   )
                 })}
@@ -171,7 +171,7 @@ export default async function CoachPage() {
             {allWorkouts.slice(0, 10).map(workout => {
               const client = clientList.find(c => c.id === workout.user_id)
               return (
-                <div key={workout.id} className="flex items-center gap-3 bg-white border border-emerald-900/10 rounded-2xl px-4 py-3">
+                <div key={workout.id} className="flex items-center gap-3 bg-white border border-emerald-900/10 hover:border-emerald-700/25 rounded-2xl px-4 py-3 lift">
                   <Dumbbell size={16} className="text-emerald-700 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <span className="text-emerald-950 text-sm font-semibold">{client?.full_name ?? 'Unknown'}</span>

@@ -21,7 +21,7 @@ interface Exercise {
   category: string
 }
 
-const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600"
+const inputClass = "w-full bg-white border border-emerald-900/15 rounded-xl px-4 py-2.5 text-emerald-950 placeholder-emerald-950/35 focus:outline-none focus:ring-2 focus:ring-emerald-600 transition-shadow duration-200 focus:shadow-md"
 
 function newRow(): ExerciseRow {
   return { id: crypto.randomUUID(), exercise_name: '', sets: '', reps: '', weight: '', unit: 'lbs', notes: '' }
@@ -85,7 +85,7 @@ function ExerciseInput({ value, onChange, exercises }: {
         className={inputClass}
       />
       {open && filtered.length > 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-emerald-900/15 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+        <div className="absolute z-50 mt-1 w-full bg-white border border-emerald-900/15 rounded-xl shadow-xl max-h-60 overflow-y-auto animate-rise-in">
           {q.length > 0 ? (
             filtered.map(e => (
               <button
@@ -93,7 +93,7 @@ function ExerciseInput({ value, onChange, exercises }: {
                 type="button"
                 onMouseDown={ev => { ev.preventDefault(); select(e.name) }}
                 onTouchEnd={ev => { ev.preventDefault(); select(e.name) }}
-                className="w-full flex items-center justify-between gap-3 text-left px-4 py-2.5 text-sm text-emerald-950 hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
+                className="w-full flex items-center justify-between gap-3 text-left px-4 py-2.5 text-sm text-emerald-950 hover:bg-emerald-50 active:bg-emerald-100 transition-colors duration-150"
               >
                 <span><Highlight name={e.name} q={q} /></span>
                 <span className="text-[10px] uppercase tracking-wide text-emerald-950/40 flex-shrink-0">{e.category}</span>
@@ -111,7 +111,7 @@ function ExerciseInput({ value, onChange, exercises }: {
                     type="button"
                     onMouseDown={ev => { ev.preventDefault(); select(e.name) }}
                     onTouchEnd={ev => { ev.preventDefault(); select(e.name) }}
-                    className="w-full text-left px-4 py-2.5 text-sm text-emerald-950 hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
+                    className="w-full text-left px-4 py-2.5 text-sm text-emerald-950 hover:bg-emerald-50 active:bg-emerald-100 transition-colors duration-150"
                   >
                     {e.name}
                   </button>
@@ -122,7 +122,7 @@ function ExerciseInput({ value, onChange, exercises }: {
         </div>
       )}
       {open && q.length > 0 && filtered.length === 0 && (
-        <div className="absolute z-50 mt-1 w-full bg-white border border-emerald-900/15 rounded-xl shadow-xl px-4 py-3 text-sm text-emerald-950/50">
+        <div className="absolute z-50 mt-1 w-full bg-white border border-emerald-900/15 rounded-xl shadow-xl px-4 py-3 text-sm text-emerald-950/50 animate-rise-in">
           No match — keep typing to use &ldquo;{query}&rdquo; as a custom exercise.
         </div>
       )}
@@ -225,10 +225,10 @@ export default function LogWorkoutForm({ exercises }: { exercises: Exercise[] })
 
         <div className="divide-y divide-emerald-900/10">
           {rows.map((row, i) => (
-            <div key={row.id} className="p-4 space-y-3">
+            <div key={row.id} className="p-4 space-y-3 animate-rise-in">
               <div className="flex items-center justify-between">
                 <span className="text-emerald-950/55 text-sm font-medium">Exercise {i + 1}</span>
-                <button onClick={() => removeRow(row.id)} className="text-emerald-950/30 hover:text-red-500 transition-colors">
+                <button onClick={() => removeRow(row.id)} className="text-emerald-950/30 hover:text-red-500 press">
                   <Trash2 size={15} />
                 </button>
               </div>
@@ -277,14 +277,14 @@ export default function LogWorkoutForm({ exercises }: { exercises: Exercise[] })
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 transition-colors"
+          className="flex items-center gap-2 bg-emerald-800 hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-900/20 disabled:opacity-50 text-white font-semibold rounded-xl px-6 py-2.5 press"
         >
           <Save size={16} />
           {saving ? 'Saving...' : 'Save Workout'}
         </button>
         <button
           onClick={() => setRows([...rows, newRow()])}
-          className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 text-emerald-950 font-medium rounded-xl px-4 py-2.5 transition-colors"
+          className="flex items-center gap-2 bg-white border border-emerald-900/15 hover:border-emerald-700/40 hover:shadow-md text-emerald-950 font-medium rounded-xl px-4 py-2.5 press"
         >
           <Plus size={16} /> Add Exercise
         </button>

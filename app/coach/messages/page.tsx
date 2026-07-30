@@ -33,7 +33,7 @@ export default async function CoachMessagesPage() {
   })
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 stagger">
       <div>
         <p className="text-xs font-semibold uppercase tracking-[0.25em] text-emerald-700">Direct Line</p>
         <h1 className="font-display text-4xl font-semibold text-emerald-950 mt-1">Messages</h1>
@@ -48,7 +48,7 @@ export default async function CoachMessagesPage() {
               <Link
                 key={client.id}
                 href={`/coach/messages/${client.id}`}
-                className="flex items-center gap-4 bg-white border border-emerald-900/10 hover:border-emerald-700/40 hover:shadow-[0_4px_20px_rgba(6,78,59,0.08)] rounded-2xl p-4 transition-all group"
+                className="flex items-center gap-4 bg-white border border-emerald-900/10 hover:border-emerald-700/40 hover:shadow-[0_8px_28px_rgba(6,78,59,0.10)] rounded-2xl p-4 lift group"
               >
                 <div className="w-10 h-10 rounded-full bg-emerald-800 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                   {client.full_name?.charAt(0) ?? '?'}
@@ -71,7 +71,7 @@ export default async function CoachMessagesPage() {
                     {format(new Date(latest.created_at), 'MMM d')}
                   </span>
                 )}
-                <ChevronRight size={16} className="text-emerald-950/30 group-hover:text-emerald-700 transition-colors flex-shrink-0" />
+                <ChevronRight size={16} className="text-emerald-950/30 group-hover:text-emerald-700 nudge-x flex-shrink-0" />
               </Link>
             )
           })}

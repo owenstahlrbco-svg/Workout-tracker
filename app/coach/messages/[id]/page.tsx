@@ -15,9 +15,9 @@ export default async function CoachThreadPage({ params }: { params: Promise<{ id
   if (!client) redirect('/coach/messages')
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 stagger">
       <div className="flex items-center gap-4">
-        <Link href="/coach/messages" className="text-emerald-950/50 hover:text-emerald-950 transition-colors">
+        <Link href="/coach/messages" className="text-emerald-950/50 hover:text-emerald-950 press inline-block">
           <ArrowLeft size={20} />
         </Link>
         <div>
@@ -27,7 +27,7 @@ export default async function CoachThreadPage({ params }: { params: Promise<{ id
               {clientTypeLabel(client.client_type)}
             </span>
           </div>
-          <Link href={`/coach/client/${client.id}`} className="text-emerald-700 text-sm hover:text-emerald-600">
+          <Link href={`/coach/client/${client.id}`} className="text-emerald-700 text-sm hover:text-emerald-600 press inline-block">
             View full profile →
           </Link>
         </div>

@@ -3,6 +3,13 @@
 :root {
   --background: #f5f8f5;
   --foreground: #0c2419;
+
+  /* Motion — one vocabulary for the whole dashboard */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 150ms;
+  --dur-base: 240ms;
+  --dur-slow: 380ms;
 }
 
 @theme inline {
@@ -15,4 +22,146 @@
 body {
   background: var(--background);
   color: var(--foreground);
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slide-out-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes sheet-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes sheet-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(24px) scale(0.98); }
+}
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.85); }
+  60% { opacity: 1; transform: scale(1.04); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes shimmer-sweep {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(220%); }
+}
+
+/* ---------- Animation utilities ---------- */
+
+.animate-fade-in { animation: fade-in var(--dur-base) var(--ease-out-soft) both; }
+.animate-fade-out { animation: fade-out var(--dur-fast) var(--ease-in-out-soft) both; }
+.animate-rise-in { animation: rise-in var(--dur-slow) var(--ease-out-soft) both; }
+.animate-slide-in-left { animation: slide-in-left var(--dur-base) var(--ease-out-soft) both; }
+.animate-slide-out-left { animation: slide-out-left var(--dur-fast) var(--ease-in-out-soft) both; }
+.animate-sheet-in { animation: sheet-in var(--dur-base) var(--ease-out-soft) both; }
+.animate-sheet-out { animation: sheet-out var(--dur-fast) var(--ease-in-out-soft) both; }
+.animate-pop-in { animation: pop-in var(--dur-base) var(--ease-out-soft) both; }
+
+/* Stagger: put `stagger` on a container, children enter one after another. */
+.stagger > * { animation: rise-in var(--dur-slow) var(--ease-out-soft) both; }
+.stagger > *:nth-child(1) { animation-delay: 0ms; }
+.stagger > *:nth-child(2) { animation-delay: 60ms; }
+.stagger > *:nth-child(3) { animation-delay: 120ms; }
+.stagger > *:nth-child(4) { animation-delay: 180ms; }
+.stagger > *:nth-child(5) { animation-delay: 240ms; }
+.stagger > *:nth-child(6) { animation-delay: 300ms; }
+.stagger > *:nth-child(7) { animation-delay: 360ms; }
+.stagger > *:nth-child(8) { animation-delay: 420ms; }
+.stagger > *:nth-child(n + 9) { animation-delay: 480ms; }
+
+/* ---------- Interaction utilities ---------- */
+
+/* Buttons and pill actions: lift on hover, sink on press. */
+.press {
+  transition:
+    transform var(--dur-fast) var(--ease-out-soft),
+    box-shadow var(--dur-base) var(--ease-out-soft),
+    background-color var(--dur-fast) var(--ease-out-soft),
+    border-color var(--dur-fast) var(--ease-out-soft),
+    color var(--dur-fast) var(--ease-out-soft),
+    opacity var(--dur-fast) var(--ease-out-soft);
+}
+.press:hover { transform: translateY(-1px); }
+.press:active { transform: translateY(0) scale(0.97); }
+.press:disabled:hover,
+.press[aria-disabled='true']:hover { transform: none; }
+
+/* Cards and nav rows: a slightly larger, slower lift. */
+.lift {
+  transition:
+    transform var(--dur-base) var(--ease-out-soft),
+    box-shadow var(--dur-base) var(--ease-out-soft),
+    background-color var(--dur-base) var(--ease-out-soft),
+    border-color var(--dur-base) var(--ease-out-soft),
+    color var(--dur-base) var(--ease-out-soft);
+}
+.lift:hover { transform: translateY(-2px); }
+.lift:active { transform: translateY(0) scale(0.995); }
+
+/* Arrow/chevron inside a `group` slides on hover. */
+.group:hover .nudge-x { transform: translateX(3px); }
+.nudge-x { transition: transform var(--dur-base) var(--ease-out-soft), color var(--dur-base) var(--ease-out-soft); }
+
+/* Loading placeholder sweep. */
+.shimmer { position: relative; overflow: hidden; }
+.shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer-sweep 1.4s var(--ease-in-out-soft) infinite;
+}
+
+/* Focus ring that animates in with everything else. */
+.press:focus-visible,
+.lift:focus-visible {
+  outline: 2px solid rgba(4, 120, 87, 0.55);
+  outline-offset: 2px;
+}
+
+/* ---------- Respect the user's motion preference ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .press:hover,
+  .lift:hover,
+  .press:active,
+  .lift:active,
+  .group:hover .nudge-x {
+    transform: none;
+  }
 }

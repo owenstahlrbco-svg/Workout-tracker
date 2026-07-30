@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Navbar from '@/components/Navbar'
+import PageTransition from '@/components/PageTransition'
 
 export default async function CoachLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -18,7 +19,7 @@ export default async function CoachLayout({ children }: { children: React.ReactN
     <div className="md:flex md:h-screen bg-[#f5f8f5]">
       <Navbar role="coach" name={name} />
       <main className="flex-1 overflow-y-auto pt-20 px-4 pb-10 md:p-8">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
     </div>
   )
