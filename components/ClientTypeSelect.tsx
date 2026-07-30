@@ -29,9 +29,9 @@ export default function ClientTypeSelect({ clientId, current }: { clientId: stri
           key={t.value}
           onClick={() => change(t.value)}
           disabled={saving}
-          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold press disabled:opacity-60 ${
             value === t.value
-              ? 'bg-emerald-800 text-white'
+              ? 'bg-emerald-800 text-white shadow-sm shadow-emerald-900/25'
               : 'bg-emerald-900/5 text-emerald-950/60 hover:bg-emerald-900/10'
           }`}
         >
